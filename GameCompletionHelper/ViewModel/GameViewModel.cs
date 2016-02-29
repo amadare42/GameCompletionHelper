@@ -8,22 +8,26 @@ using GameCompletionHelper.Properties;
 using System.IO;
 using ProcessWatch;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GameCompletionHelper.ViewModel
 {
     public class GameViewModel : BaseViewModel, IGame, ITrackableProgram
     {
-        public Game game;
+        public IGame game;
 
         private ImageSourceConverter imageSourceConverter = new ImageSourceConverter();
 
         public GameViewModel()
         {
-            game = new Game();
+            game = Game.Empty;
         }
-        public GameViewModel(Game game)
+
+        public GameViewModel(IGame game, IGameSessionFactory sessionFactory)
         {
             this.game = game;
+            this.sessionFactory = sessionFactory;
         }
 
         #region IGame
@@ -48,16 +52,13 @@ namespace GameCompletionHelper.ViewModel
                 }
             }
         }
-        public TimeSpan TimePlayed
+
+        public TimeSpan PlayedTotal
         {
             get
             {
-                return game.TimePlayed;
-            }
-            set
-            {
-                game.TimePlayed = value;
-                OnPropertyChanged();
+                //todo: add caching
+                return game.PlayedTotal;
             }
         }
 
@@ -65,12 +66,16 @@ namespace GameCompletionHelper.ViewModel
         {
             get
             {
+                //todo: add caching
                 return game.LastLaunched;
             }
-            set
+        }
+
+        IEnumerable<GameSession> IGame.Sessions
+        {
+            get
             {
-                game.LastLaunched = value;
-                OnPropertyChanged();
+                return game.Sessions;
             }
         }
 
@@ -83,9 +88,7 @@ namespace GameCompletionHelper.ViewModel
             set
             {
                 if (IsOpened)
-                {
                     return;
-                }
                 game.Name = value;
                 OnPropertyChanged();
             }
@@ -94,6 +97,8 @@ namespace GameCompletionHelper.ViewModel
         #endregion
 
         #region ITrackableProgram
+
+        GameSession currentSession = null;
 
         string ITrackableProgram.Path
         {
@@ -105,22 +110,46 @@ namespace GameCompletionHelper.ViewModel
 
         public async void Start()
         {
-            var prevPlayed = TimePlayed;
-            LastLaunched = DateTime.Now;
-            IsOpened = true;
-            while (IsOpened)
+            if (IsOpened)
+                return;            
+            this.currentSession = sessionFactory.CreateGameSession();
+            this.AddSession(currentSession);
+            this.OnPropertyChanged(nameof(LastLaunched));
+            this.IsOpened = true;
+            while (this.IsOpened)
             {
                 await Task.Delay(1000);
-                TimePlayed = DateTime.Now - LastLaunched + prevPlayed;
+                this.currentSession.TimePlayed = DateTime.Now - this.currentSession.SessionStart;
+                this.OnPropertyChanged(nameof(PlayedTotal));
             }
         }
 
         public void Stop()
         {
             IsOpened = false;
+            this.OnPropertyChanged(nameof(AverageSessionSpan));
         }
 
         #endregion
+
+        public TimeSpan AverageSessionSpan
+        {
+            get
+            {
+                long longAverageTicks;
+                if (this.game.Sessions.Count() > 0)
+                {
+                    double doubleAverageTicks = this.game.Sessions.Average(session => session.TimePlayedTicks);
+                    longAverageTicks = Convert.ToInt64(doubleAverageTicks);
+                }
+                else
+                {
+                    longAverageTicks = 0;
+                }
+
+                return new TimeSpan(longAverageTicks);
+            }
+        }
 
         private bool isOpened;
 
@@ -149,7 +178,7 @@ namespace GameCompletionHelper.ViewModel
         {
             get
             {
-                return new RelayCommand( o => this.Run());
+                return new RelayCommand(o => this.Run());
             }
         }
 
@@ -176,6 +205,7 @@ namespace GameCompletionHelper.ViewModel
         }
 
         private BitmapImage noIconImage;
+        private IGameSessionFactory sessionFactory;
 
         public BitmapImage NoIconImage
         {
@@ -213,5 +243,9 @@ namespace GameCompletionHelper.ViewModel
             return this.Name;
         }
 
+        public void AddSession(GameSession session)
+        {
+            this.game.AddSession(session);
+        }
     }
 }

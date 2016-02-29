@@ -35,16 +35,18 @@ namespace GameCompletionHelper.ViewModel
             this.Games = new ObservableCollection<GameViewModel>();
         }
 
-        public MainViewModel(IGamesProvider gamesProvider, IGameTracker gameTracker, IGameRandomizator gameRandomizator)
+        public MainViewModel(IGamesProvider gamesProvider, IGameTracker gameTracker, IGameRandomizator gameRandomizator, IGameViewModelFactory gameViewModelFactory)
         {
             this.gamesProvider = gamesProvider;
             this.gameTracker = gameTracker;
             this.gameRandomizator = gameRandomizator;
+            this.gameViewModelFactory = gameViewModelFactory;
+
             //todo: move to loading part
             var games = gamesProvider.GetGames();
             this.Games = new ObservableCollection<GameViewModel>();
 
-            foreach (var game in games.Select(g => new GameViewModel(g)))
+            foreach (var game in games.Select(g => this.gameViewModelFactory.CreateGameViewModel(g)))
             {
                 this.RegisterGame(game);
             }
@@ -58,21 +60,12 @@ namespace GameCompletionHelper.ViewModel
             while (autoSaving)
             {
                 await Task.Delay(3000);
-                gamesProvider.SaveGames(this.Games.Select(gvm => gvm.game));
+                gamesProvider.SaveGames(this.Games);
             }
         }
 
         private GameViewModel selectedGame;
-
-        private void LaunchNotifier_GameOpened(object sender, GameEventArgs e)
-        {
-            ((GameViewModel)e.Game).IsOpened = true;
-        }
-
-        private void LaunchNotifier_GameClosed(object sender, GameEventArgs e)
-        {
-            ((GameViewModel)e.Game).IsOpened = false;
-        }
+        private IGameViewModelFactory gameViewModelFactory;
 
         public GameViewModel SelectedGame
         {
@@ -133,10 +126,7 @@ namespace GameCompletionHelper.ViewModel
 
         public void AddGame(object o)
         {
-            var newGame = new GameViewModel(new Game
-            {
-                Name = "New Game"
-            });
+            var newGame = this.gameViewModelFactory.CreateDefaultGaveViewModel();
             RegisterGame(newGame);
         }
 

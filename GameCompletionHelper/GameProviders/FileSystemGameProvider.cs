@@ -19,7 +19,7 @@ namespace GameCompletionHelper.GameProviders
         {
             FilePath = filePath;
         }
-        public IEnumerable<Game> GetGames()
+        public IEnumerable<IGame> GetGames()
         {
             try {
                 using (Stream stream = File.Open(FilePath, FileMode.Open))
@@ -33,9 +33,26 @@ namespace GameCompletionHelper.GameProviders
             }
         }
 
-        public void SaveGames(IEnumerable<Game> games)
+        public void SaveGames(IEnumerable<IGame> games)
         {
-            var gamesList = games.ToList();
+            List<Game> gamesList;
+            var gameEnumerable = games as IEnumerable<Game>;
+            if (gameEnumerable!=null)
+            {
+                gamesList = gameEnumerable.ToList();
+            }
+            else
+            {
+                gamesList = games.Select(igame =>
+                {
+                    return new Game()
+                    {
+                        Name = igame.Name,
+                        PathToExe = igame.PathToExe,
+                        Sessions = igame.Sessions.ToList()
+                    };
+                }).ToList();
+            }
             using (Stream stream = File.Open(FilePath, FileMode.Create))
             {
                 serializer.Serialize(stream, gamesList);

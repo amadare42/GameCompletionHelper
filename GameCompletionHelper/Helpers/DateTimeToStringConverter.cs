@@ -8,6 +8,7 @@ using System.Windows.Data;
 
 namespace GameCompletionHelper.Helpers
 {
+    [ValueConversion(typeof(DateTime), typeof(string))]
     class DateTimeToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

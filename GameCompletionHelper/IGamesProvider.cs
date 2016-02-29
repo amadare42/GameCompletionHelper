@@ -5,7 +5,7 @@ namespace GameCompletionHelper
 {
     public interface IGamesProvider
     {
-        IEnumerable<Game> GetGames();
-        void SaveGames(IEnumerable<Game> games);
+        IEnumerable<IGame> GetGames();
+        void SaveGames(IEnumerable<IGame> games);
     }
 }

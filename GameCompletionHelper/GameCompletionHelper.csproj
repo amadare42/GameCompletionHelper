@@ -77,16 +77,22 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BaseViewModel.cs" />
+    <Compile Include="DefaultGameSessionFactory.cs" />
+    <Compile Include="DefaultGameViewModelFactory.cs" />
     <Compile Include="DefaultGameRandomizator.cs" />
     <Compile Include="DefaultGameTracker.cs" />
     <Compile Include="GameEventArgs.cs" />
+    <Compile Include="GameFactory.cs" />
     <Compile Include="GameProviders\FileSystemGameProvider.cs" />
     <Compile Include="Helpers\DateTimeToStringConverter.cs" />
     <Compile Include="Helpers\InvertBoolConverter.cs" />
     <Compile Include="IGame.cs" />
+    <Compile Include="IGameSessionFactory.cs" />
+    <Compile Include="IGameViewModelFactory.cs" />
     <Compile Include="IGameRandomizator.cs" />
     <Compile Include="IGamesProvider.cs" />
     <Compile Include="IGameTracker.cs" />
+    <Compile Include="Model\GameSession.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="ViewModel\GameViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />

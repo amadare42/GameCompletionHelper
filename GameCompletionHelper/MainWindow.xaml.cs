@@ -12,7 +12,8 @@ namespace GameCompletionHelper
         public MainWindow()
         {
             InitializeComponent();
-            var viewModel = new MainViewModel(new FileSystemGameProvider(), new DefaultGameTracker(), new DefaultGameRandomizator());
+            var gameViewModelFactory = new DefaultGameViewModelFactory(new DefaultGameSessionFactory());
+            var viewModel = new MainViewModel(new FileSystemGameProvider(), new DefaultGameTracker(), new DefaultGameRandomizator(), gameViewModelFactory);
             this.DataContext = viewModel;
         }
     }

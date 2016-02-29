@@ -22,6 +22,7 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -33,17 +34,27 @@
         <Label Grid.Column="0" Grid.Row="1">Path</Label>
         <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Path=PathToExe}" IsReadOnly="{Binding Path=IsOpened}"/>
         <Label Grid.Column="0" Grid.Row="2">Last Launched</Label>
-        <TextBox Grid.Column="1" Grid.Row="2" IsReadOnly="True" Text="{Binding Path=LastLaunched, Converter={StaticResource DateTimeConverter}}"/>
-        <Label Grid.Column="0" Grid.Row="3">Time played</Label>
+        <TextBox Grid.Column="1" Grid.Row="2" IsReadOnly="True" Text="{Binding Path=LastLaunched, Mode=OneWay, Converter={StaticResource DateTimeConverter}}"/>
+        <Label Grid.Column="0" Grid.Row="3">Played total</Label>
         <TextBox Grid.Column="1" Grid.Row="3" IsReadOnly="True">
             <TextBox.Text>
                 <MultiBinding StringFormat="{}{0:00}:{1:00;00}:{2:00;00}">
-                    <Binding Path="TimePlayed.Hours" Mode="OneWay"/>
-                    <Binding Path="TimePlayed.Minutes" Mode="OneWay"/>
-                    <Binding Path="TimePlayed.Seconds" Mode="OneWay"/>
+                    <Binding Path="PlayedTotal.Hours" Mode="OneWay"/>
+                    <Binding Path="PlayedTotal.Minutes" Mode="OneWay"/>
+                    <Binding Path="PlayedTotal.Seconds" Mode="OneWay"/>
                 </MultiBinding>
             </TextBox.Text>
         </TextBox>
-        <Button Grid.Row="4" Grid.ColumnSpan="2" Command="{Binding Path=RunCommand}">Run</Button>
+        <Label Grid.Row="4">Average session</Label>
+        <TextBox Grid.Row="4" Grid.Column="1" IsReadOnly="True">
+            <TextBox.Text>
+                <MultiBinding StringFormat="{}{0:00}:{1:00;00}:{2:00;00}">
+                    <Binding Path="AverageSessionSpan.Hours" Mode="OneWay"/>
+                    <Binding Path="AverageSessionSpan.Minutes" Mode="OneWay"/>
+                    <Binding Path="AverageSessionSpan.Seconds" Mode="OneWay"/>
+                </MultiBinding>                
+            </TextBox.Text>
+        </TextBox>
+        <Button Grid.Row="5" Grid.ColumnSpan="2" Command="{Binding Path=RunCommand}">Run</Button>
     </Grid>
 </UserControl>
