@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="GameCompletionHelper.Views.GameEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GameCompletionHelper.Views"
+             xmlns:model="clr-namespace:GameCompletionHelper.Model" 
+             xmlns:viewModel="clr-namespace:GameCompletionHelper.ViewModel"
+             xmlns:helpers="clr-namespace:GameCompletionHelper.Helpers"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.DataContext>
+        <viewModel:GameViewModel />
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <helpers:DateTimeToStringConverter x:Key="DateTimeConverter"/>
+        <helpers:InvertBoolConverter x:Key="InvBoolConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Column="0">Name</Label>
+        <TextBox Grid.Column="1" Text="{Binding Path=Name}" IsReadOnly="{Binding Path=IsOpened}"/>
+        <Label Grid.Column="0" Grid.Row="1">Path</Label>
+        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Path=PathToExe}" IsReadOnly="{Binding Path=IsOpened}"/>
+        <Label Grid.Column="0" Grid.Row="2">Last Launched</Label>
+        <TextBox Grid.Column="1" Grid.Row="2" IsReadOnly="True" Text="{Binding Path=LastLaunched, Converter={StaticResource DateTimeConverter}}"/>
+        <Label Grid.Column="0" Grid.Row="3">Time played</Label>
+        <TextBox Grid.Column="1" Grid.Row="3" IsReadOnly="True">
+            <TextBox.Text>
+                <MultiBinding StringFormat="{}{0:00}:{1:00;00}:{2:00;00}">
+                    <Binding Path="TimePlayed.Hours" Mode="OneWay"/>
+                    <Binding Path="TimePlayed.Minutes" Mode="OneWay"/>
+                    <Binding Path="TimePlayed.Seconds" Mode="OneWay"/>
+                </MultiBinding>
+            </TextBox.Text>
+        </TextBox>
+        <Button Grid.Row="4" Grid.ColumnSpan="2" Command="{Binding Path=RunCommand}">Run</Button>
+    </Grid>
+</UserControl>
