@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GameCompletionHelper.Model;
 using System.Xml.Serialization;
 using System.IO;
@@ -24,12 +21,12 @@ namespace GameCompletionHelper.GameProviders
             try {
                 using (Stream stream = File.Open(FilePath, FileMode.Open))
                 {
-                    return (List<Game>)serializer.Deserialize(stream);
+                    return (IEnumerable<IGame>)serializer.Deserialize(stream);
                 }
             }
             catch
             {
-                return new List<Game>();
+                return new List<IGame>();
             }
         }
 
@@ -45,11 +42,14 @@ namespace GameCompletionHelper.GameProviders
             {
                 gamesList = games.Select(igame =>
                 {
+
                     return new Game()
                     {
                         Name = igame.Name,
                         PathToExe = igame.PathToExe,
-                        Sessions = igame.Sessions.ToList()
+                        Sessions = igame.Sessions.ToList(),
+                        RunAsAdmin = igame.RunAsAdmin,
+                        RunPath = igame.RunPath
                     };
                 }).ToList();
             }

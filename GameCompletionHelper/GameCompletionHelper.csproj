@@ -99,6 +99,13 @@
     <Compile Include="Views\GameEditor.xaml.cs">
       <DependentUpon>GameEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GameOptions.xaml.cs">
+      <DependentUpon>GameOptions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GameOptionsWindow.xaml.cs">
+      <DependentUpon>GameOptionsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Win32API.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -112,6 +119,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\GameEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GameOptions.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GameOptionsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

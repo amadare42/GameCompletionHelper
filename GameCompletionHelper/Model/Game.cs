@@ -53,6 +53,11 @@ namespace GameCompletionHelper.Model
             this.Sessions.Add(session);
         }
 
+        public void RemoveSession(GameSession session)
+        {
+            this.Sessions.Remove(session);
+        }
+
         public static Game Empty
         {
             get
@@ -64,5 +69,11 @@ namespace GameCompletionHelper.Model
             }
         }
 
+        public bool RunAsAdmin { get; set; }
+
+        public string RunPath
+        {
+            get; set;
+        }
     }
 }

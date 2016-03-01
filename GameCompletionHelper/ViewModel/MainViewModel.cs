@@ -112,10 +112,24 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public RelayCommand ShowNextGameCommand
+        {
+            get
+            {
+                return new RelayCommand(this.ShowNextGame);
+            }
+        }
+
         private void RunNextGame(object obj)
         {
             var gameViewModel = ((GameViewModel)this.gameRandomizator.GetGame(this.Games));
             gameViewModel.Run();
+        }
+
+        private void ShowNextGame(object obj)
+        {
+            var gameViewModel = ((GameViewModel)this.gameRandomizator.GetGame(this.Games));
+            SelectedGame = gameViewModel;
         }
 
         private void RemoveCurrentGame(object obj)

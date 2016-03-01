@@ -10,6 +10,10 @@ using ProcessWatch;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
+using GameCompletionHelper.Views;
+using System.Windows;
+using System.Text;
+using Microsoft.Win32;
 
 namespace GameCompletionHelper.ViewModel
 {
@@ -122,12 +126,18 @@ namespace GameCompletionHelper.ViewModel
                 this.currentSession.TimePlayed = DateTime.Now - this.currentSession.SessionStart;
                 this.OnPropertyChanged(nameof(PlayedTotal));
             }
+            if (this.currentSession.TimePlayed.Seconds < 10)
+            {
+                this.RemoveSession(this.currentSession);
+                this.OnPropertyChanged(nameof(PlayedTotal));
+                this.OnPropertyChanged(nameof(LastLaunched));
+            }
+            this.OnPropertyChanged(nameof(AverageSessionSpan));
         }
 
         public void Stop()
         {
             IsOpened = false;
-            this.OnPropertyChanged(nameof(AverageSessionSpan));
         }
 
         #endregion
@@ -182,9 +192,62 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public RelayCommand ShowOptionsCommand
+        {
+            get
+            {
+                return new RelayCommand(o => this.ShowOptions());
+            }
+        }
+
+        public RelayCommand ShowInExplorerCommand
+        {
+            get
+            {
+                return new RelayCommand(e => ShowInExplorer());
+            }
+        }
+
+        public RelayCommand SelectFileCommand
+        {
+            get
+            {
+                return new RelayCommand(e => SelectFile());
+            }
+        }
+
+        private void SelectFile()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Executables (*.exe)|*.exe";
+            openFileDialog.Multiselect = false;
+            if (openFileDialog.ShowDialog() == true)
+            {
+                this.PathToExe = openFileDialog.FileName;
+            }
+        }
+
+        private void ShowOptions()
+        {
+            var window = new GameOptionsWindow();
+            window.DataContext = this;
+            window.Show();
+        }
+
         public void Run()
         {
-            Process.Start(this.PathToExe);
+            //todo: implement run as admin
+            Process.Start(string.IsNullOrEmpty(RunPath) ? this.PathToExe : RunPath);
+        }
+
+        public void ShowInExplorer()
+        {
+            string args = string.Format("/e, /select, \"{0}\"", this.PathToExe);
+
+            ProcessStartInfo info = new ProcessStartInfo();
+            info.FileName = "explorer";
+            info.Arguments = args;
+            Process.Start(info);
         }
 
         public ImageSource GameIcon
@@ -222,6 +285,32 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public bool RunAsAdmin
+        {
+            get
+            {
+                return game.RunAsAdmin;
+            }
+            set
+            {
+                game.RunAsAdmin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string RunPath
+        {
+            get
+            {
+                return game.RunPath;
+            }
+            set
+            {
+                game.RunPath = value;
+                OnPropertyChanged();
+            }
+        }
+
         BitmapImage BitmapToImageSource(Bitmap bitmap)
         {
             using (MemoryStream memory = new MemoryStream())
@@ -246,6 +335,11 @@ namespace GameCompletionHelper.ViewModel
         public void AddSession(GameSession session)
         {
             this.game.AddSession(session);
+        }
+
+        public void RemoveSession(GameSession session)
+        {
+            this.game.RemoveSession(session);
         }
     }
 }

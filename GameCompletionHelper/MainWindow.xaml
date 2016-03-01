@@ -58,6 +58,7 @@
         </Grid.RowDefinitions>
         <Menu x:Name="menu" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Height="20" VerticalAlignment="Top">
             <MenuItem Header="Run game" Command="{Binding Path=RunNextGameCommand}"></MenuItem>
+            <MenuItem Header="Select game" Command="{Binding Path=ShowNextGameCommand}"></MenuItem>
         </Menu>
         <ListView Grid.Row="1" ItemsSource="{Binding Path=Games}" SelectedValue="{Binding SelectedGame}" ItemTemplate="{StaticResource GameViewModelTemplate}" />
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"></GridSplitter>
