@@ -11,8 +11,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using GameCompletionHelper.Views;
-using System.Windows;
-using System.Text;
 using Microsoft.Win32;
 
 namespace GameCompletionHelper.ViewModel
@@ -112,11 +110,18 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
-        public async void Start()
+        public void Start()
         {
             if (IsOpened)
-                return;            
-            this.currentSession = sessionFactory.CreateGameSession();
+                return;
+            this.Start(DateTime.Now);
+        }
+
+        public async void Start(DateTime startTime)
+        {
+            if (IsOpened)
+                return;
+            this.currentSession = sessionFactory.CreateGameSession(startTime);
             this.AddSession(currentSession);
             this.OnPropertyChanged(nameof(LastLaunched));
             this.IsOpened = true;
@@ -133,6 +138,7 @@ namespace GameCompletionHelper.ViewModel
                 this.OnPropertyChanged(nameof(LastLaunched));
             }
             this.OnPropertyChanged(nameof(AverageSessionSpan));
+
         }
 
         public void Stop()

@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameCompletionHelper", "GameCompletionHelper\GameCompletionHelper.csproj", "{78E2701A-BDE3-450F-8034-AFB103019C03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessWatch", "ProcessWatch\ProcessWatch.csproj", "{44F235FC-0098-4160-A380-439895D6EC81}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Debug|x64.ActiveCfg = Debug|x64
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Debug|x64.Build.0 = Debug|x64
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Release|x64.ActiveCfg = Release|x64
+		{78E2701A-BDE3-450F-8034-AFB103019C03}.Release|x64.Build.0 = Release|x64
+		{44F235FC-0098-4160-A380-439895D6EC81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F235FC-0098-4160-A380-439895D6EC81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44F235FC-0098-4160-A380-439895D6EC81}.Debug|x64.ActiveCfg = Debug|x64
+		{44F235FC-0098-4160-A380-439895D6EC81}.Debug|x64.Build.0 = Debug|x64
+		{44F235FC-0098-4160-A380-439895D6EC81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44F235FC-0098-4160-A380-439895D6EC81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F235FC-0098-4160-A380-439895D6EC81}.Release|x64.ActiveCfg = Release|x64
+		{44F235FC-0098-4160-A380-439895D6EC81}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

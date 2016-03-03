@@ -9,11 +9,11 @@ namespace GameCompletionHelper
 {
     class DefaultGameSessionFactory : IGameSessionFactory
     {
-        public GameSession CreateGameSession()
+        public GameSession CreateGameSession(DateTime startTime)
         {
             return new GameSession()
             {
-                SessionStart = DateTime.Now
+                SessionStart = startTime
             };
         }
     }

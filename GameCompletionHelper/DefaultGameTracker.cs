@@ -16,6 +16,7 @@ namespace GameCompletionHelper
         public void AddGame(ITrackableProgram game)
         {
             tracker.TrackedPrograms.Add(game);
+            tracker.CheckRunningProcesses();
         }
 
         public void RemoveGame(ITrackableProgram game)
@@ -26,6 +27,7 @@ namespace GameCompletionHelper
         public void SetGames(IEnumerable<ITrackableProgram> games)
         {
             tracker.TrackedPrograms = games.ToList();
+            tracker.CheckRunningProcesses();
         }
     }
 }

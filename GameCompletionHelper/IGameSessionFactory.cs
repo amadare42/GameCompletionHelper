@@ -9,6 +9,6 @@ namespace GameCompletionHelper
 {
     public interface IGameSessionFactory
     {
-        GameSession CreateGameSession();
+        GameSession CreateGameSession(DateTime startTime);
     }
 }
