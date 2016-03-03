@@ -31,7 +31,7 @@ namespace ProcessWatch
                     var fileName = process.MainModule.FileName;
                     var id = process.Id;
                     var trackedPrograms = TrackedPrograms.Where(prog => 
-                                                                    string.Compare(prog.Path, fileName, true) == 0 
+                                                                    string.Compare(prog.Path, fileName, true) == 0
                                                                     && !trackedProcessesPaths.ContainsKey(id)).ToList();
 
                     if (trackedPrograms.Count > 0)
@@ -52,14 +52,20 @@ namespace ProcessWatch
 
         private void ProcessHook_ProcessStopped(object sender, ProcessStopEventArgs e)
         {
-            //todo: multi-instance support
             string path;
             if (trackedProcessesPaths.TryGetValue(e.ProcessId, out path))
             {
                 var tracked = TrackedPrograms.Where(prog => string.Compare(prog.Path, path, true) == 0).ToList();
+                trackedProcessesPaths.Remove(e.ProcessId);
+                if (trackedProcessesPaths.ContainsValue(path))
+                {
+                    //if program enters this block then there is more than one instance
+                    //of program running
+                    return;
+                }
+
                 if (tracked.Count > 0)
                     tracked.ForEach(prog => prog.Stop());
-                trackedProcessesPaths.Remove(e.ProcessId);
             }
         }
 
