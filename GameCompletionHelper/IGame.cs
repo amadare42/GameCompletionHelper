@@ -15,6 +15,11 @@ namespace GameCompletionHelper
         string Name { get; set; }
 
         void AddSession(GameSession session);
+
         void RemoveSession(GameSession session);
+
+        bool HasSessionAt(DateTime startTime);
+
+        GameSession GetSessionAt(DateTime startTime);
     }
 }

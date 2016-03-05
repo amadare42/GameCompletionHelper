@@ -1,7 +1,4 @@
-﻿using ProcessWatch;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Xml.Serialization;
+﻿using System.Windows;
 
 namespace GameCompletionHelper
 {
@@ -17,7 +14,7 @@ namespace GameCompletionHelper
 
         protected override void OnExit(ExitEventArgs e)
         {
-            ProcessHook.Instanse.Dispose();
+            //ProcessHook.Instanse.Dispose();
             base.OnExit(e);
         }
     }

@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameCompletionHelper.Model;
-using System.Xml.Serialization;
+﻿using GameCompletionHelper.Model;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace GameCompletionHelper.GameProviders
 {
-    class FileSystemGameProvider : IGamesProvider
+    internal class FileSystemGameProvider : IGamesProvider
     {
-        XmlSerializer serializer = new XmlSerializer(typeof(List<Game>));
+        private XmlSerializer serializer = new XmlSerializer(typeof(List<Game>));
 
         public string FilePath { get; set; }
 
@@ -16,9 +16,11 @@ namespace GameCompletionHelper.GameProviders
         {
             FilePath = filePath;
         }
+
         public IEnumerable<IGame> GetGames()
         {
-            try {
+            try
+            {
                 using (Stream stream = File.Open(FilePath, FileMode.Open))
                 {
                     return (IEnumerable<IGame>)serializer.Deserialize(stream);
@@ -34,7 +36,7 @@ namespace GameCompletionHelper.GameProviders
         {
             List<Game> gamesList;
             var gameEnumerable = games as IEnumerable<Game>;
-            if (gameEnumerable!=null)
+            if (gameEnumerable != null)
             {
                 gamesList = gameEnumerable.ToList();
             }
@@ -42,7 +44,7 @@ namespace GameCompletionHelper.GameProviders
             {
                 gamesList = games.Select(igame =>
                 {
-
+                    //todo: implement automapping
                     return new Game()
                     {
                         Name = igame.Name,

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GameCompletionHelper.Model;
+﻿using GameCompletionHelper.Model;
+using System;
 
 namespace GameCompletionHelper
 {
-    class DefaultGameSessionFactory : IGameSessionFactory
+    internal class DefaultGameSessionFactory : IGameSessionFactory
     {
         public GameSession CreateGameSession(DateTime startTime)
         {

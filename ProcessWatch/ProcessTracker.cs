@@ -1,83 +1,146 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 
 namespace ProcessWatch
 {
-    public class ProcessTracker
+    internal class ProcessTracker : IProcessTracker
     {
-        private Dictionary<int, string> trackedProcessesPaths = new Dictionary<int, string>();
-        public List<ITrackableProgram> TrackedPrograms;
+        private Dictionary<int, string> processIdPathDictonary = new Dictionary<int, string>();
 
-        public ProcessTracker()
+        private List<ITrackableProgram> trackedPrograms;
+        private IProcessesProvider processProvider;
+
+        private Dictionary<int, string> processesIds = new Dictionary<int, string>();
+        private HashSet<string> processPaths = new HashSet<string>();
+
+        public ProcessTracker(IProcessesProvider processProvider, IProcessNotifier notifier, IEnumerable<ITrackableProgram> trackedPrograms = null)
         {
-            TrackedPrograms = new List<ITrackableProgram>();
-            ProcessHook.Instanse.ProcessStarted += ProcessHook_ProcessStarted;
-            ProcessHook.Instanse.ProcessStopped += ProcessHook_ProcessStopped;
-            if (!ProcessHook.Instanse.IsHooked)
+            this.trackedPrograms = new List<ITrackableProgram>(
+                trackedPrograms ?? new ITrackableProgram[0]);
+            this.processProvider = processProvider;
+
+            this.AttachNotifyEvents(notifier);
+            if (trackedPrograms != null)
             {
-                ProcessHook.Instanse.StartHooking();
+                this.UpdateProcesses(this.trackedPrograms);
             }
         }
 
-        public void CheckRunningProcesses()
+        private void AttachNotifyEvents(IProcessNotifier notifier)
         {
-            foreach (var process in Process.GetProcesses())
+            notifier.ProcessStarted += OnProcessStarted;
+            notifier.ProcessStopped += OnProcessStopped;
+        }
+
+        public void UpdateProcesses(IEnumerable<ITrackableProgram> newPrograms = null)
+        {
+            newPrograms = newPrograms ?? new ITrackableProgram[0];
+
+            Dictionary<int, string> runningProcessIds = new Dictionary<int, string>();
+            HashSet<string> runningProcessPaths = new HashSet<string>();
+
+            var programTimes = new Dictionary<ITrackableProgram, List<DateTime>>();
+            foreach (ITrackableProgram tprog in this.trackedPrograms)
+                programTimes.Add(tprog, new List<DateTime>());
+
+            foreach (var process in processProvider.GetProcesses())
             {
                 try
                 {
-                    var fileName = process.MainModule.FileName;
-                    var id = process.Id;
-                    var trackedPrograms = TrackedPrograms.Where(prog => 
-                                                                    string.Compare(prog.Path, fileName, true) == 0
-                                                                    && !trackedProcessesPaths.ContainsKey(id)).ToList();
+                    var processId = process.Id;
+                    var processPath = process.Path.ToLower();
+                    var isNewProgram = newPrograms.Any(p => p.Path.Equals(processPath, StringComparison.CurrentCultureIgnoreCase));
+                    runningProcessIds[processId] = processPath;
+                    runningProcessPaths.Add(processPath);
 
-                    if (trackedPrograms.Count > 0)
+                    if (!this.processesIds.ContainsKey(processId) || isNewProgram)
                     {
-                        //getting all process data before adding it to dictionary to prevent issues
-                        //when process in exited during its processing
                         var startTime = process.StartTime;
 
-                        trackedProcessesPaths.Add(id, fileName);
-                        trackedPrograms.ForEach(prog => prog.Start(startTime));
+                        foreach (var program in trackedPrograms)
+                        {
+                            if (processPath.Equals(program.Path, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                programTimes[program].Add(startTime);
+                            }
+                        }
                     }
                 }
-                catch (Exception e) when (e is NotSupportedException || e is Win32Exception || e is PlatformNotSupportedException || e is InvalidOperationException) {
+                catch (Win32Exception e)
+                {
                     //empty, just process other process :)
                 }
             }
+
+            foreach (var prog in this.trackedPrograms)
+            {
+                var wasRunning = processPaths.Contains(prog.Path.ToLower());
+                var nowRunning = runningProcessPaths.Contains(prog.Path.ToLower());
+
+                if (wasRunning && !nowRunning)
+                    prog.Stop();
+
+                if ((!nowRunning && wasRunning)
+                    || (newPrograms.Contains(prog) && programTimes[prog].Count > 0))
+                    prog.Start(programTimes[prog].Min());
+            }
+
+            processesIds = runningProcessIds;
+            processPaths = runningProcessPaths;
         }
 
-        private void ProcessHook_ProcessStopped(object sender, ProcessStopEventArgs e)
+        public void AddProgram(ITrackableProgram program)
+        {
+            this.trackedPrograms.Add(program);
+            this.UpdateProcesses(new ITrackableProgram[] { program });
+        }
+
+        public void AddPrograms(IEnumerable<ITrackableProgram> programs)
+        {
+            var programList = programs.ToList();
+            this.trackedPrograms.AddRange(programList);
+            this.UpdateProcesses(programList);
+        }
+
+        public void RemoveProgram(ITrackableProgram program)
+        {
+            this.trackedPrograms.Remove(program);
+        }
+
+        private void OnProcessStopped(object sender, ProcessStopEventArgs e)
         {
             string path;
-            if (trackedProcessesPaths.TryGetValue(e.ProcessId, out path))
-            {
-                var tracked = TrackedPrograms.Where(prog => string.Compare(prog.Path, path, true) == 0).ToList();
-                trackedProcessesPaths.Remove(e.ProcessId);
-                if (trackedProcessesPaths.ContainsValue(path))
-                {
-                    //if program enters this block then there is more than one instance
-                    //of program running
-                    return;
-                }
+            if (!this.processesIds.TryGetValue(e.ProcessId, out path))
+                return;
 
-                if (tracked.Count > 0)
-                    tracked.ForEach(prog => prog.Stop());
+            this.processesIds.Remove(e.ProcessId);
+            var subscribers = this.trackedPrograms.Where(prog => prog.Path.Equals(path, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+            if (!this.processesIds.ContainsValue(path))
+            {
+                this.processPaths.Remove(path);
+
+                if (subscribers.Count > 0)
+                    subscribers.ForEach(s => s.Stop());
             }
         }
 
-        private void ProcessHook_ProcessStarted(object sender, ProcessStartEventArgs e)
+        private void OnProcessStarted(object sender, ProcessStartEventArgs e)
         {
-            var tracked = TrackedPrograms.Where(prog => string.Compare(prog.Path, e.FileName, true) == 0).ToList();
-            if (tracked.Count > 0)
+            this.processesIds[e.Id] = e.FileName;
+            if (!this.processPaths.Contains(e.FileName))
             {
-                trackedProcessesPaths.Add(e.Id, e.FileName);
-                tracked.ForEach(prog => prog.Start());
+                foreach (var prog in this.trackedPrograms)
+                {
+                    if (prog.Path.Equals(e.FileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        prog.Start(e.StartTime);
+                    }
+                }
+                this.processPaths.Add(e.FileName.ToLower());
             }
         }
-
     }
 }

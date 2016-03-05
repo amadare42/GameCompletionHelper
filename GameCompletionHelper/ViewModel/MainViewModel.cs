@@ -1,7 +1,8 @@
 ﻿using GameCompletionHelper.Model;
+using ProcessWatch;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System;
 using System.Threading.Tasks;
 
 namespace GameCompletionHelper.ViewModel
@@ -11,7 +12,7 @@ namespace GameCompletionHelper.ViewModel
         public ObservableCollection<GameViewModel> Games { get; set; }
 
         private IGamesProvider gamesProvider { get; set; }
-        private IGameTracker gameTracker { get; set; }
+        private IProcessTracker gameTracker { get; set; }
         private IGameRandomizator gameRandomizator { get; set; }
 
         private bool autoSaving;
@@ -29,13 +30,12 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
-
         public MainViewModel()
         {
             this.Games = new ObservableCollection<GameViewModel>();
         }
 
-        public MainViewModel(IGamesProvider gamesProvider, IGameTracker gameTracker, IGameRandomizator gameRandomizator, IGameViewModelFactory gameViewModelFactory)
+        public MainViewModel(IGamesProvider gamesProvider, IProcessTracker gameTracker, IGameRandomizator gameRandomizator, IGameViewModelFactory gameViewModelFactory)
         {
             this.gamesProvider = gamesProvider;
             this.gameTracker = gameTracker;
@@ -120,9 +120,24 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public RelayCommand UpdateProcessesCommand
+        {
+            get
+            {
+                return new RelayCommand(e => UpdateProcesses());
+            }
+        }
+
+        private void UpdateProcesses()
+        {
+            this.gameTracker.UpdateProcesses();
+        }
+
         private void RunNextGame(object obj)
         {
             var gameViewModel = ((GameViewModel)this.gameRandomizator.GetGame(this.Games));
+            if (gameViewModel == null)
+                return;
             gameViewModel.Run();
         }
 
@@ -134,7 +149,7 @@ namespace GameCompletionHelper.ViewModel
 
         private void RemoveCurrentGame(object obj)
         {
-            this.gameTracker.RemoveGame(SelectedGame);
+            this.gameTracker.RemoveProgram(SelectedGame);
             this.Games.Remove(SelectedGame);
         }
 
@@ -162,14 +177,21 @@ namespace GameCompletionHelper.ViewModel
             var game = ((GameViewModel)sender);
             if (e.PropertyName == "FileExists" && game.FileExists)
             {
-                AddGameToTracker(game);
-                game.PropertyChanged -= NewGame_PropertyChanged;
+                if (game.FileExists)
+                {
+                    AddGameToTracker(game);
+                }
+                else
+                {
+                    this.gameTracker.RemoveProgram(game);
+                }
+                //game.PropertyChanged -= NewGame_PropertyChanged;
             }
         }
 
         private void AddGameToTracker(GameViewModel gameViewModel)
         {
-            this.gameTracker.AddGame(gameViewModel);
+            this.gameTracker.AddProgram(gameViewModel);
         }
 
         public void SaveAll(object o)

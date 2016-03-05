@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameCompletionHelper", "Gam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessWatch", "ProcessWatch\ProcessWatch.csproj", "{44F235FC-0098-4160-A380-439895D6EC81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessWatch.Tests", "ProcessWatch.Tests\ProcessWatch.Tests.csproj", "{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{44F235FC-0098-4160-A380-439895D6EC81}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44F235FC-0098-4160-A380-439895D6EC81}.Release|x64.ActiveCfg = Release|x64
 		{44F235FC-0098-4160-A380-439895D6EC81}.Release|x64.Build.0 = Release|x64
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Debug|x64.Build.0 = Debug|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Release|x64.ActiveCfg = Release|Any CPU
+		{08A2A39D-E8F4-46FA-B3AD-A7BCA8FC7D12}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameCompletionHelper
+namespace ProcessWatch
 {
-    class GameFactory
+    internal interface IProcessesProvider
     {
+        IEnumerable<IProcessInfo> GetProcesses();
     }
 }

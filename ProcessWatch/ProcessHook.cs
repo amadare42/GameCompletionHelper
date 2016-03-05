@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Management;
-using System.Diagnostics;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Management;
 
 namespace ProcessWatch
 {
-    //todo: rewrite to non-singleton class
-    public class ProcessHook : IDisposable
+    public class ProcessHook : IProcessNotifier
     {
-        static private ProcessHook hook;
-        public static ProcessHook Instanse
-        {
-            get
-            {
-                if (hook == null)
-                    hook = new ProcessHook();
-                return hook;
-            }
-        }
-
         public event EventHandler<ProcessStartEventArgs> ProcessStarted;
+
         public event EventHandler<ProcessStopEventArgs> ProcessStopped;
 
         private ManagementEventWatcher StartWatch;
@@ -27,7 +16,7 @@ namespace ProcessWatch
 
         public bool IsHooked { get; private set; }
 
-        private ProcessHook()
+        public ProcessHook()
         {
             StartWatch = new ManagementEventWatcher(new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
             StopWatch = new ManagementEventWatcher(new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace"));
@@ -42,6 +31,7 @@ namespace ProcessWatch
 
             StartWatch.Start();
             StopWatch.Start();
+            IsHooked = true;
         }
 
         public void StopHooking()
@@ -51,18 +41,20 @@ namespace ProcessWatch
 
             StartWatch.Stop();
             StopWatch.Stop();
+            IsHooked = false;
         }
 
-        void stopWatch_EventArrived(object sender, EventArrivedEventArgs e)
+        private void stopWatch_EventArrived(object sender, EventArrivedEventArgs e)
         {
             if (ProcessStopped == null)
                 return;
+            var time = DateTime.Now;
 
             var processId = (int)(uint)e.NewEvent.Properties["ProcessID"].Value;
-            ProcessStopped(sender, new ProcessStopEventArgs(processId, (string)e.NewEvent.Properties["ProcessName"].Value));
+            ProcessStopped(sender, new ProcessStopEventArgs(processId, (string)e.NewEvent.Properties["ProcessName"].Value, time));
         }
 
-        void startWatch_EventArrived(object sender, EventArrivedEventArgs e)
+        private void startWatch_EventArrived(object sender, EventArrivedEventArgs e)
         {
             if (ProcessStarted == null)
                 return;
@@ -71,10 +63,8 @@ namespace ProcessWatch
             try
             {
                 var process = Process.GetProcessById(processId);
-                if (!process.HasExited)
-                {
-                    ProcessStarted(sender, new ProcessStartEventArgs(process.MainModule.FileName, process.Id));
-                }
+                var args = new ProcessStartEventArgs(WinApi.GetExecutablePathAboveVista(processId), processId, process.StartTime);
+                ProcessStarted(sender, args);
             }
             catch (InvalidOperationException) { }
             catch (ArgumentException) { }
@@ -90,15 +80,18 @@ namespace ProcessWatch
         }
     }
 
+    //todo: merge event args
     public class ProcessStopEventArgs : EventArgs
     {
         public readonly int ProcessId;
         public readonly string ProcessName;
+        public readonly DateTime endTime;
 
-        public ProcessStopEventArgs(int id, string name)
+        public ProcessStopEventArgs(int id, string name, DateTime time)
         {
             ProcessId = id;
             ProcessName = name;
+            endTime = time;
         }
     }
 
@@ -106,10 +99,13 @@ namespace ProcessWatch
     {
         public string FileName { get; private set; }
         public int Id { get; private set; }
-        public ProcessStartEventArgs(string fileName, int id)
+        public DateTime StartTime { get; private set; }
+
+        public ProcessStartEventArgs(string fileName, int id, DateTime startTime)
         {
             this.Id = id;
             this.FileName = fileName;
-        }        
+            this.StartTime = startTime;
+        }
     }
 }

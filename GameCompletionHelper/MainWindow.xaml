@@ -21,7 +21,7 @@
             <Setter Property="Foreground" Value="Red"></Setter>
             <Setter Property="FontWeight" Value="Bold"></Setter>
         </Style>
-        
+
         <DataTemplate x:Key="GameViewModelTemplate" DataType="viewModels:GameViewModel">
             <Border BorderBrush="Black"  HorizontalAlignment="Stretch">
                 <Grid HorizontalAlignment="Stretch">
@@ -29,17 +29,17 @@
                         <ColumnDefinition Width="32" />
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" Height="32" Source="{Binding Path=GameIcon}" OpacityMask="Black"/>
-                    <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Path=Name}" VerticalAlignment="Center" x:Name="textBlock"/>
+                    <Image Grid.Column="0" Height="32" Source="{Binding Path=GameIcon}" OpacityMask="Black" />
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding Path=Name}" VerticalAlignment="Center" x:Name="textBlock" />
                 </Grid>
             </Border>
 
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsOpened}" Value="True">
-                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource LaunchedGameStyle}"/>
+                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource LaunchedGameStyle}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding FileExists}" Value="False">
-                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource NotValidatedGameStyle}"/>
+                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource NotValidatedGameStyle}" />
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -59,6 +59,7 @@
         <Menu x:Name="menu" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Height="20" VerticalAlignment="Top">
             <MenuItem Header="Run game" Command="{Binding Path=RunNextGameCommand}"></MenuItem>
             <MenuItem Header="Select game" Command="{Binding Path=ShowNextGameCommand}"></MenuItem>
+            <MenuItem Header="Force update" Command="{Binding Path=UpdateProcessesCommand}"></MenuItem>
         </Menu>
         <ListView Grid.Row="1" ItemsSource="{Binding Path=Games}" SelectedValue="{Binding SelectedGame}" ItemTemplate="{StaticResource GameViewModelTemplate}" />
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"></GridSplitter>

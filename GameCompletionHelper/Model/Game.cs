@@ -14,6 +14,7 @@ namespace GameCompletionHelper.Model
         }
 
         public string PathToExe { get; set; }
+
         [XmlIgnore]
         public TimeSpan PlayedTotal
         {
@@ -24,7 +25,9 @@ namespace GameCompletionHelper.Model
                 return total;
             }
         }
+
         public List<GameSession> Sessions { get; set; }
+
         IEnumerable<GameSession> IGame.Sessions
         {
             get
@@ -32,6 +35,7 @@ namespace GameCompletionHelper.Model
                 return this.Sessions;
             }
         }
+
         public DateTime LastLaunched
         {
             get
@@ -43,6 +47,7 @@ namespace GameCompletionHelper.Model
         }
 
         public string Name { get; set; }
+
         public override string ToString()
         {
             return this.Name;
@@ -56,6 +61,16 @@ namespace GameCompletionHelper.Model
         public void RemoveSession(GameSession session)
         {
             this.Sessions.Remove(session);
+        }
+
+        public bool HasSessionAt(DateTime startTime)
+        {
+            return this.Sessions.Any(s => s.SessionStart == startTime);
+        }
+
+        public GameSession GetSessionAt(DateTime startTime)
+        {
+            return this.Sessions.FirstOrDefault(s => s.SessionStart == startTime);
         }
 
         public static Game Empty
