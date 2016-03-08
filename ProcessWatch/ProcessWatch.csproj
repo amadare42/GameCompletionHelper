@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveWindowHook.cs" />
     <Compile Include="DefaultProcessProvider.cs" />
     <Compile Include="DefaultProcessTrackerFactory.cs" />
     <Compile Include="Interfaces\IProcessesProvider.cs" />
