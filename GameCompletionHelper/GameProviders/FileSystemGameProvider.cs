@@ -50,8 +50,7 @@ namespace GameCompletionHelper.GameProviders
                         Name = igame.Name,
                         PathToExe = igame.PathToExe,
                         Sessions = igame.Sessions.ToList(),
-                        RunAsAdmin = igame.RunAsAdmin,
-                        RunPath = igame.RunPath
+                        Options = igame.Options
                     };
                 }).ToList();
             }

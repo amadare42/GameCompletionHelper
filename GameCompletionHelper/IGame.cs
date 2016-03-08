@@ -6,9 +6,8 @@ namespace GameCompletionHelper
 {
     public interface IGame
     {
+        Options Options { get; set; }
         string PathToExe { get; set; }
-        string RunPath { get; set; }
-        bool RunAsAdmin { get; set; }
         TimeSpan PlayedTotal { get; }
         DateTime LastLaunched { get; }
         IEnumerable<GameSession> Sessions { get; }
@@ -17,8 +16,6 @@ namespace GameCompletionHelper
         void AddSession(GameSession session);
 
         void RemoveSession(GameSession session);
-
-        bool HasSessionAt(DateTime startTime);
 
         GameSession GetSessionAt(DateTime startTime);
     }

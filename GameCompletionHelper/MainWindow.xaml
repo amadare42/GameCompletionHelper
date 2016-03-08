@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:GameCompletionHelper"
         xmlns:viewModels="clr-namespace:GameCompletionHelper.ViewModel"
         xmlns:views="clr-namespace:GameCompletionHelper.Views"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Icon="Icon.ico"
         Title="Game Completion Helper" Height="350" Width="525">
     <Window.DataContext>
         <viewModels:MainViewModel />
@@ -62,7 +62,7 @@
             <MenuItem Header="Force update" Command="{Binding Path=UpdateProcessesCommand}"></MenuItem>
         </Menu>
         <ListView Grid.Row="1" ItemsSource="{Binding Path=Games}" SelectedValue="{Binding SelectedGame}" ItemTemplate="{StaticResource GameViewModelTemplate}" />
-        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"></GridSplitter>
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="2" HorizontalAlignment="Stretch"></GridSplitter>
         <Button Grid.Row="2" Command="{Binding AddGameCommand}">Add game</Button>
         <Button Grid.Row="3" Command="{Binding SaveAllCommand}">Save</Button>
         <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">

@@ -19,9 +19,87 @@ namespace GameCompletionHelper.ViewModel
     {
         public IGame game;
 
-        private ImageSourceConverter imageSourceConverter = new ImageSourceConverter();
+        private IGameSessionFactory sessionFactory;
 
-        public GameViewModel()
+        public ImageSource GameIcon
+        {
+            get
+            {
+                if (File.Exists(game.PathToExe))
+                {
+                    try
+                    {
+                        Bitmap bmpSource = Icon.ExtractAssociatedIcon(game.PathToExe).ToBitmap();
+                        return BitmapHelper.BitmapToImageSource(bmpSource);
+                    }
+                    catch { }
+                }
+                return BitmapHelper.NoIconImage;
+            }
+        }
+
+        private bool isActive = true;
+
+        public bool IsActive
+        {
+            get
+            {
+                return isActive;
+            }
+            set
+            {
+                var changed = isActive == value;
+                isActive = value;
+                if (changed)
+                    OnPropertyChanged();
+            }
+        }
+
+        public TimeSpan AverageSessionSpan
+        {
+            get
+            {
+                long longAverageTicks;
+                if (this.game.Sessions.Count() > 0)
+                {
+                    double doubleAverageTicks = this.game.Sessions.Average(session => session.TimePlayedTicks);
+                    longAverageTicks = Convert.ToInt64(doubleAverageTicks);
+                }
+                else
+                {
+                    longAverageTicks = 0;
+                }
+
+                return new TimeSpan(longAverageTicks);
+            }
+        }
+
+        private bool isOpened;
+
+        public bool IsOpened
+        {
+            get
+            {
+                return isOpened;
+            }
+            set
+            {
+                isOpened = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool FileExists
+        {
+            get
+            {
+                return File.Exists(PathToExe);
+            }
+        }
+
+        #region ctors
+
+        internal GameViewModel()
         {
             game = Game.Empty;
         }
@@ -31,6 +109,8 @@ namespace GameCompletionHelper.ViewModel
             this.game = game;
             this.sessionFactory = sessionFactory;
         }
+
+        #endregion ctors
 
         #region IGame
 
@@ -77,6 +157,19 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public Options Options
+        {
+            get
+            {
+                return this.game.Options;
+            }
+
+            set
+            {
+                this.game.Options = value;
+            }
+        }
+
         IEnumerable<GameSession> IGame.Sessions
         {
             get
@@ -98,11 +191,28 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public void AddSession(GameSession session)
+        {
+            this.game.AddSession(session);
+        }
+
+        public void RemoveSession(GameSession session)
+        {
+            this.game.RemoveSession(session);
+        }
+
+        public GameSession GetSessionAt(DateTime startTime)
+        {
+            return this.game.GetSessionAt(startTime);
+        }
+
         #endregion IGame
 
         #region ITrackableProgram
 
         private GameSession currentSession = null;
+
+        private bool wasMinimized = false;
 
         string ITrackableProgram.Path
         {
@@ -129,6 +239,8 @@ namespace GameCompletionHelper.ViewModel
             while (this.IsOpened)
             {
                 await Task.Delay(500);
+                if (!this.IsActive)
+                    continue;
                 this.currentSession.TimePlayed = DateTime.Now - this.currentSession.SessionStart;
                 this.OnPropertyChanged(nameof(PlayedTotal));
             }
@@ -145,51 +257,14 @@ namespace GameCompletionHelper.ViewModel
         public void Stop()
         {
             IsOpened = false;
+            if (this.wasMinimized)
+                WinApi.RestoreAll();
+            this.wasMinimized = false;
         }
 
         #endregion ITrackableProgram
 
-        public TimeSpan AverageSessionSpan
-        {
-            get
-            {
-                long longAverageTicks;
-                if (this.game.Sessions.Count() > 0)
-                {
-                    double doubleAverageTicks = this.game.Sessions.Average(session => session.TimePlayedTicks);
-                    longAverageTicks = Convert.ToInt64(doubleAverageTicks);
-                }
-                else
-                {
-                    longAverageTicks = 0;
-                }
-
-                return new TimeSpan(longAverageTicks);
-            }
-        }
-
-        private bool isOpened;
-
-        public bool IsOpened
-        {
-            get
-            {
-                return isOpened;
-            }
-            set
-            {
-                isOpened = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool FileExists
-        {
-            get
-            {
-                return File.Exists(PathToExe);
-            }
-        }
+        #region Commands
 
         public RelayCommand RunCommand
         {
@@ -223,28 +298,14 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
-        private void SelectFile()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Executables (*.exe)|*.exe";
-            openFileDialog.Multiselect = false;
-            if (openFileDialog.ShowDialog() == true)
-            {
-                this.PathToExe = openFileDialog.FileName;
-            }
-        }
+        #endregion Commands
 
-        private void ShowOptions()
-        {
-            var window = new GameOptionsWindow();
-            window.DataContext = this;
-            window.Show();
-        }
+        #region Command methods
 
         public void Run()
         {
             //todo: implement run as admin
-            Process process = new Process();
+            /*Process process = new Process();
             process.StartInfo.FileName = string.IsNullOrEmpty(RunPath) ? this.PathToExe : RunPath;
             if (this.RunAsAdmin)
             {
@@ -253,7 +314,24 @@ namespace GameCompletionHelper.ViewModel
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.Verb = "runas";
             }
-            process.Start();
+            process.Start();*/
+            var runPath = this.game.Options.RunPath;
+            var minimize = this.game.Options.MinimizeWindowsOnStart;
+
+            if (minimize)
+            {
+                WinApi.MinimizeAll();
+                wasMinimized = true;
+            }
+            Process.Start(string.IsNullOrEmpty(runPath) ? this.PathToExe : runPath);
+        }
+
+        private void ShowOptions()
+        {
+            var viewModel = new OptionsViewModel(this.game.Options);
+            var window = new GameOptionsWindow(viewModel);
+            window.DataContext = viewModel;
+            window.Show();
         }
 
         public void ShowInExplorer()
@@ -266,105 +344,22 @@ namespace GameCompletionHelper.ViewModel
             Process.Start(info);
         }
 
-        public ImageSource GameIcon
+        private void SelectFile()
         {
-            get
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Executables (*.exe)|*.exe";
+            openFileDialog.Multiselect = false;
+            if (openFileDialog.ShowDialog() == true)
             {
-                if (File.Exists(game.PathToExe))
-                {
-                    try
-                    {
-                        Bitmap bmpSource = Icon.ExtractAssociatedIcon(game.PathToExe).ToBitmap();
-                        return BitmapToImageSource(bmpSource);
-                    }
-                    catch { }
-                }
-                return this.NoIconImage;
+                this.PathToExe = openFileDialog.FileName;
             }
         }
 
-        private BitmapImage noIconImage;
-        private IGameSessionFactory sessionFactory;
-
-        public BitmapImage NoIconImage
-        {
-            get
-            {
-                if (noIconImage == null)
-                {
-                    var noIcon = Resources.NoIcon;
-                    noIcon.MakeTransparent(noIcon.GetPixel(0, 0));
-                    noIconImage = BitmapToImageSource(noIcon);
-                }
-                return noIconImage;
-            }
-        }
-
-        public bool RunAsAdmin
-        {
-            get
-            {
-                return game.RunAsAdmin;
-            }
-            set
-            {
-                game.RunAsAdmin = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string RunPath
-        {
-            get
-            {
-                return game.RunPath;
-            }
-            set
-            {
-                game.RunPath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private BitmapImage BitmapToImageSource(Bitmap bitmap)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-
-                return bitmapimage;
-            }
-        }
+        #endregion Command methods
 
         public override string ToString()
         {
             return this.Name;
-        }
-
-        public void AddSession(GameSession session)
-        {
-            this.game.AddSession(session);
-        }
-
-        public void RemoveSession(GameSession session)
-        {
-            this.game.RemoveSession(session);
-        }
-
-        public bool HasSessionAt(DateTime startTime)
-        {
-            return this.game.HasSessionAt(startTime);
-        }
-
-        public GameSession GetSessionAt(DateTime startTime)
-        {
-            return this.game.GetSessionAt(startTime);
         }
     }
 }

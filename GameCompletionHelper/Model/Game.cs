@@ -11,9 +11,12 @@ namespace GameCompletionHelper.Model
         public Game()
         {
             this.Sessions = new List<GameSession>();
+            this.Options = new Options();
         }
 
         public string PathToExe { get; set; }
+
+        public Options Options { get; set; }
 
         [XmlIgnore]
         public TimeSpan PlayedTotal
@@ -63,11 +66,6 @@ namespace GameCompletionHelper.Model
             this.Sessions.Remove(session);
         }
 
-        public bool HasSessionAt(DateTime startTime)
-        {
-            return this.Sessions.Any(s => s.SessionStart == startTime);
-        }
-
         public GameSession GetSessionAt(DateTime startTime)
         {
             return this.Sessions.FirstOrDefault(s => s.SessionStart == startTime);
@@ -82,13 +80,6 @@ namespace GameCompletionHelper.Model
                     Name = "New Game"
                 };
             }
-        }
-
-        public bool RunAsAdmin { get; set; }
-
-        public string RunPath
-        {
-            get; set;
         }
     }
 }

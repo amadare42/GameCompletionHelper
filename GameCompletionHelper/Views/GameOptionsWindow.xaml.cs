@@ -19,8 +19,9 @@ namespace GameCompletionHelper.Views
     /// </summary>
     public partial class GameOptionsWindow : Window
     {
-        public GameOptionsWindow()
+        public GameOptionsWindow(object dataContext)
         {
+            this.DataContext = dataContext;
             InitializeComponent();
         }
     }
