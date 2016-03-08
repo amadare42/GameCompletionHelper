@@ -5,7 +5,13 @@ namespace ProcessWatch
     public interface ITrackableProgram
     {
         string Path { get; }
+
         void Start(DateTime startTime);
-        void Stop(); 
+
+        void Stop();
+
+        void Deactivate();
+
+        void Activate();
     }
 }

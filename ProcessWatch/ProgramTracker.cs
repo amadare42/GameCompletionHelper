@@ -1,37 +1,38 @@
-﻿using System;
+﻿using ProcessWatch.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
 namespace ProcessWatch
 {
-    internal class ProcessTracker : IProcessTracker
+    //todo: use path-program dictionary instead of grabbing Path from ITrackableProgram
+    internal class ProgramTracker : IProgramTracker
     {
-        private Dictionary<int, string> processIdPathDictonary = new Dictionary<int, string>();
-
-        private List<ITrackableProgram> trackedPrograms;
-        private IProcessesProvider processProvider;
-
-        private Dictionary<int, string> processesIds = new Dictionary<int, string>();
+        private Dictionary<int, string> processIdPathDictionary = new Dictionary<int, string>();
         private HashSet<string> processPaths = new HashSet<string>();
+        private List<ITrackableProgram> trackedPrograms;
+        private List<ITrackableProgram> activePrograms;
+        private int activeProgramId = -1;
 
-        public ProcessTracker(IProcessesProvider processProvider, IProcessNotifier notifier, IEnumerable<ITrackableProgram> trackedPrograms = null)
+        private IProcessesProvider processProvider;
+        private IProcessNotifier processNotifier;
+        private IActiveWindowNotifier windowNotifier;
+
+        public ProgramTracker(IProcessesProvider processProvider, IProcessNotifier processNotifier, IActiveWindowNotifier windowNotifier,
+                                IEnumerable<ITrackableProgram> trackedPrograms = null)
         {
-            this.trackedPrograms = new List<ITrackableProgram>(
-                trackedPrograms ?? new ITrackableProgram[0]);
+            this.trackedPrograms = new List<ITrackableProgram>(trackedPrograms ?? new ITrackableProgram[0]);
+            this.activePrograms = new List<ITrackableProgram>();
             this.processProvider = processProvider;
+            this.windowNotifier = windowNotifier;
+            this.processNotifier = processNotifier;
 
-            this.AttachNotifyEvents(notifier);
+            this.AttachNotifyEvents();
             if (trackedPrograms != null)
             {
                 this.UpdateProcesses(this.trackedPrograms);
             }
-        }
-
-        private void AttachNotifyEvents(IProcessNotifier notifier)
-        {
-            notifier.ProcessStarted += OnProcessStarted;
-            notifier.ProcessStopped += OnProcessStopped;
         }
 
         public void UpdateProcesses(IEnumerable<ITrackableProgram> newPrograms = null)
@@ -49,13 +50,13 @@ namespace ProcessWatch
             {
                 try
                 {
-                    var processId = process.Id;
                     var processPath = process.Path.ToLower();
                     var isNewProgram = newPrograms.Any(p => p.Path.Equals(processPath, StringComparison.CurrentCultureIgnoreCase));
-                    runningProcessIds[processId] = processPath;
+                    runningProcessIds[process.Id] = processPath;
                     runningProcessPaths.Add(processPath);
 
-                    if (!this.processesIds.ContainsKey(processId) || isNewProgram)
+                    //notify if program just started is newly subscribed
+                    if (!this.processIdPathDictionary.ContainsKey(process.Id) || isNewProgram)
                     {
                         var startTime = process.StartTime;
 
@@ -74,6 +75,7 @@ namespace ProcessWatch
                 }
             }
 
+            //sending start/stop to running programs
             foreach (var prog in this.trackedPrograms)
             {
                 var wasRunning = processPaths.Contains(prog.Path.ToLower());
@@ -87,9 +89,36 @@ namespace ProcessWatch
                     prog.Start(programTimes[prog].Min());
             }
 
-            processesIds = runningProcessIds;
+            processIdPathDictionary = runningProcessIds;
             processPaths = runningProcessPaths;
         }
+
+        public void UpdateActiveWindowState()
+        {
+            int newProgramId = windowNotifier.GetActiveWindowOwnerProcessId();
+            UpdateActiveWindowsStateToId(newProgramId);
+        }
+
+        private void UpdateActiveWindowsStateToId(int newProgramId)
+        {
+            //Deactivate old programs
+            if (this.activeProgramId != newProgramId && this.activeProgramId != -1)
+                this.activePrograms.ForEach(p => p.Deactivate());
+            this.activeProgramId = newProgramId;
+
+            //Activate new programs
+            string path;
+            if (processIdPathDictionary.TryGetValue(newProgramId, out path))
+            {
+                foreach (var prog in trackedPrograms.Where(p => p.Path.Equals(path, StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    prog.Activate();
+                    activePrograms.Add(prog);
+                }
+            }
+        }
+
+        #region IProgramTracker
 
         public void AddProgram(ITrackableProgram program)
         {
@@ -109,16 +138,44 @@ namespace ProcessWatch
             this.trackedPrograms.Remove(program);
         }
 
+        public void Update()
+        {
+            UpdateProcesses();
+            UpdateActiveWindowState();
+        }
+
+        #endregion IProgramTracker
+
+        private void AttachNotifyEvents()
+        {
+            processNotifier.ProcessStarted += OnProcessStarted;
+            processNotifier.ProcessStopped += OnProcessStopped;
+            windowNotifier.ActiveWindowChanged += OnActiveWindowChanged;
+        }
+
+        private void DeatachNotifyEvents()
+        {
+            if (processNotifier != null)
+            {
+                processNotifier.ProcessStarted -= OnProcessStarted;
+                processNotifier.ProcessStopped -= OnProcessStopped;
+            }
+            if (windowNotifier != null)
+            {
+                windowNotifier.ActiveWindowChanged -= OnActiveWindowChanged;
+            }
+        }
+
         private void OnProcessStopped(object sender, ProcessStopEventArgs e)
         {
             string path;
-            if (!this.processesIds.TryGetValue(e.ProcessId, out path))
+            if (!this.processIdPathDictionary.TryGetValue(e.ProcessId, out path))
                 return;
 
-            this.processesIds.Remove(e.ProcessId);
+            this.processIdPathDictionary.Remove(e.ProcessId);
             var subscribers = this.trackedPrograms.Where(prog => prog.Path.Equals(path, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
-            if (!this.processesIds.ContainsValue(path))
+            if (!this.processIdPathDictionary.ContainsValue(path))
             {
                 this.processPaths.Remove(path);
 
@@ -129,7 +186,9 @@ namespace ProcessWatch
 
         private void OnProcessStarted(object sender, ProcessStartEventArgs e)
         {
-            this.processesIds[e.Id] = e.FileName;
+            this.processIdPathDictionary[e.Id] = e.FileName;
+
+            //todo: add C:\Windows\SysWOW64 support
             if (!this.processPaths.Contains(e.FileName))
             {
                 foreach (var prog in this.trackedPrograms)
@@ -141,6 +200,16 @@ namespace ProcessWatch
                 }
                 this.processPaths.Add(e.FileName.ToLower());
             }
+        }
+
+        private void OnActiveWindowChanged(IntPtr hWnd, int processId)
+        {
+            this.UpdateActiveWindowsStateToId(processId);
+        }
+
+        ~ProgramTracker()
+        {
+            this.DeatachNotifyEvents();
         }
     }
 }

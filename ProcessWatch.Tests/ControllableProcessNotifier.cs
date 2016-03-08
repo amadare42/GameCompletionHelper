@@ -1,9 +1,10 @@
 ﻿using ProcessWatch;
+using ProcessWatch.Interfaces;
 using System;
 
 namespace ProcessWatch.Tests
 {
-    internal class ControllableProcessNotifier : IProcessNotifier
+    internal class ControllableProcessNotifier : IProcessNotifier, IControllableHook
     {
         public event EventHandler<ProcessStartEventArgs> ProcessStarted;
 
@@ -26,6 +27,14 @@ namespace ProcessWatch.Tests
         }
 
         public void Dispose()
+        {
+        }
+
+        public void StartHook()
+        {
+        }
+
+        public void PauseHook()
         {
         }
     }

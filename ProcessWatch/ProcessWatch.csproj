@@ -61,16 +61,18 @@
   <ItemGroup>
     <Compile Include="ActiveWindowHook.cs" />
     <Compile Include="DefaultProcessProvider.cs" />
-    <Compile Include="DefaultProcessTrackerFactory.cs" />
+    <Compile Include="Interfaces\IControllableHook.cs" />
+    <Compile Include="Interfaces\IActiveWindowChangedNotifier.cs" />
+    <Compile Include="ProcessTrackerSource.cs" />
     <Compile Include="Interfaces\IProcessesProvider.cs" />
     <Compile Include="Interfaces\IProcessInfo.cs" />
     <Compile Include="Interfaces\IProcessNotifier.cs" />
-    <Compile Include="Interfaces\IProcessTrackerFactory.cs" />
+    <Compile Include="Interfaces\IProgramTrackerSource.cs" />
     <Compile Include="Interfaces\ITrackableProgram.cs" />
-    <Compile Include="Interfaces\IProcessTacker.cs" />
+    <Compile Include="Interfaces\IProgramTacker.cs" />
     <Compile Include="ProcessHook.cs" />
-    <Compile Include="ProcessTracker.cs" />
-    <Compile Include="SimpleTrackableProgram.cs" />
+    <Compile Include="ProgramTracker.cs" />
+    <Compile Include="ProcessTrackerSourceFactory.cs" />
     <Compile Include="TrackedProcessInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WinApi.cs" />

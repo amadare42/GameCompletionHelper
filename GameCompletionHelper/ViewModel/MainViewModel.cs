@@ -12,7 +12,7 @@ namespace GameCompletionHelper.ViewModel
         public ObservableCollection<GameViewModel> Games { get; set; }
 
         private IGamesProvider gamesProvider { get; set; }
-        private IProcessTracker gameTracker { get; set; }
+        private IProgramTracker gameTracker { get; set; }
         private IGameRandomizator gameRandomizator { get; set; }
 
         private bool autoSaving;
@@ -35,7 +35,7 @@ namespace GameCompletionHelper.ViewModel
             this.Games = new ObservableCollection<GameViewModel>();
         }
 
-        public MainViewModel(IGamesProvider gamesProvider, IProcessTracker gameTracker, IGameRandomizator gameRandomizator, IGameViewModelFactory gameViewModelFactory)
+        public MainViewModel(IGamesProvider gamesProvider, IProgramTracker gameTracker, IGameRandomizator gameRandomizator, IGameViewModelFactory gameViewModelFactory)
         {
             this.gamesProvider = gamesProvider;
             this.gameTracker = gameTracker;
@@ -130,7 +130,7 @@ namespace GameCompletionHelper.ViewModel
 
         private void UpdateProcesses()
         {
-            this.gameTracker.UpdateProcesses();
+            this.gameTracker.Update();
         }
 
         private void RunNextGame(object obj)

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ProcessWatch.Interfaces;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Management;
 
 namespace ProcessWatch
 {
-    public class ProcessHook : IProcessNotifier
+    public class ProcessHook : IProcessNotifier, IControllableHook, IDisposable
     {
         public event EventHandler<ProcessStartEventArgs> ProcessStarted;
 
@@ -20,8 +21,8 @@ namespace ProcessWatch
         {
             StartWatch = new ManagementEventWatcher(new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
             StopWatch = new ManagementEventWatcher(new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace"));
-            StartWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
-            StopWatch.EventArrived += new EventArrivedEventHandler(stopWatch_EventArrived);
+            StartWatch.EventArrived += startWatch_EventArrived;
+            StopWatch.EventArrived += stopWatch_EventArrived;
         }
 
         public void StartHooking()
@@ -71,41 +72,24 @@ namespace ProcessWatch
             catch (Win32Exception) { }
         }
 
+        public void StartHook()
+        {
+            StartWatch.Start();
+            StopWatch.Start();
+        }
+
+        public void PauseHook()
+        {
+            StopWatch.Stop();
+            StartWatch.Stop();
+        }
+
         public void Dispose()
         {
             StopWatch.Stop();
             StartWatch.Stop();
             StartWatch.Dispose();
             StopWatch.Dispose();
-        }
-    }
-
-    //todo: merge event args
-    public class ProcessStopEventArgs : EventArgs
-    {
-        public readonly int ProcessId;
-        public readonly string ProcessName;
-        public readonly DateTime endTime;
-
-        public ProcessStopEventArgs(int id, string name, DateTime time)
-        {
-            ProcessId = id;
-            ProcessName = name;
-            endTime = time;
-        }
-    }
-
-    public class ProcessStartEventArgs : EventArgs
-    {
-        public string FileName { get; private set; }
-        public int Id { get; private set; }
-        public DateTime StartTime { get; private set; }
-
-        public ProcessStartEventArgs(string fileName, int id, DateTime startTime)
-        {
-            this.Id = id;
-            this.FileName = fileName;
-            this.StartTime = startTime;
         }
     }
 }

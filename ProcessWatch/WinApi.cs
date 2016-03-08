@@ -9,14 +9,14 @@ namespace ProcessWatch
     class WinApi
     {
         [DllImport("kernel32.dll")]
-        private static extern bool QueryFullProcessImageName(IntPtr hprocess, int dwFlags,
+        static extern bool QueryFullProcessImageName(IntPtr hprocess, int dwFlags,
                StringBuilder lpExeName, out int size);
         [DllImport("kernel32.dll")]
-        private static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess,
+        static extern IntPtr OpenProcess(ProcessAccessFlags dwDesiredAccess,
                        bool bInheritHandle, int dwProcessId);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool CloseHandle(IntPtr hHandle);
+        static extern bool CloseHandle(IntPtr hHandle);
 
         public static string GetExecutablePathAboveVista(int ProcessId)
         {

@@ -2,7 +2,7 @@
 
 namespace ProcessWatch
 {
-    public interface IProcessTracker
+    public interface IProgramTracker
     {
         void AddProgram(ITrackableProgram program);
 
@@ -10,6 +10,6 @@ namespace ProcessWatch
 
         void RemoveProgram(ITrackableProgram program);
 
-        void UpdateProcesses(IEnumerable<ITrackableProgram> newPrograms = null);
+        void Update();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ProcessWatch;
+using ProcessWatch.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProcessWatch.Tests
 {
-    internal class ProcessProviderMock : IProcessesProvider
+    internal class ProcessProviderMock : IProcessesProvider, IControllableHook
     {
         public List<IProcessInfo> Processes = new List<IProcessInfo>();
 
@@ -23,6 +24,14 @@ namespace ProcessWatch.Tests
         public IEnumerable<IProcessInfo> GetProcesses()
         {
             return Processes;
+        }
+
+        public void StartHook()
+        {
+        }
+
+        public void PauseHook()
+        {
         }
     }
 }

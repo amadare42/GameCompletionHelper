@@ -262,6 +262,16 @@ namespace GameCompletionHelper.ViewModel
             this.wasMinimized = false;
         }
 
+        public void Activate()
+        {
+            //todo: implement Activate login
+        }
+
+        public void Deactivate()
+        {
+            //todo: implement Deactivate login
+        }
+
         #endregion ITrackableProgram
 
         #region Commands
