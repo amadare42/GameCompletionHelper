@@ -224,7 +224,6 @@ namespace GameCompletionHelper.ViewModel
 
         public async void Start(DateTime startTime)
         {
-            //todo: fix multiinstance sesion management
             if (IsOpened)
                 return;
 

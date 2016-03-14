@@ -186,19 +186,20 @@ namespace ProcessWatch
 
         private void OnProcessStarted(object sender, ProcessStartEventArgs e)
         {
-            this.processIdPathDictionary[e.Id] = e.FileName;
+            var path = e.FileName.ToLower();
+            this.processIdPathDictionary[e.Id] = path;
 
             //todo: add C:\Windows\SysWOW64 support
-            if (!this.processPaths.Contains(e.FileName))
+            if (!this.processPaths.Contains(path))
             {
                 foreach (var prog in this.trackedPrograms)
                 {
-                    if (prog.Path.Equals(e.FileName, StringComparison.InvariantCultureIgnoreCase))
+                    if (prog.Path.Equals(path, StringComparison.InvariantCultureIgnoreCase))
                     {
                         prog.Start(e.StartTime);
                     }
                 }
-                this.processPaths.Add(e.FileName.ToLower());
+                this.processPaths.Add(path);
             }
         }
 
