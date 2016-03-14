@@ -1,12 +1,15 @@
 ﻿using GameCompletionHelper.Formatters;
+using GameCompletionHelper.Helpers;
+using GameCompletionHelper.Interfaces;
 using GameCompletionHelper.Model;
-using GameCompletionHelper.Properties;
 using GameCompletionHelper.ViewModel.Enums;
 using GameCompletionHelper.Views;
 using Microsoft.Win32;
 using ProcessWatch;
+using ProcessWatch.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -18,7 +21,7 @@ namespace GameCompletionHelper.ViewModel
 {
     public class GameViewModel : BaseViewModel, IGame, ITrackableProgram
     {
-        public IGame game;
+        public readonly IGame game;
         private readonly bool InDesign;
 
         private IGameSessionFactory sessionFactory;
@@ -117,6 +120,18 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        private GameSession selectedGameSession;
+
+        public GameSession SelectedGameSession
+        {
+            get { return selectedGameSession; }
+            set
+            {
+                selectedGameSession = value;
+                OnPropertyChanged();
+            }
+        }
+
         private GameState gameState;
 
         public GameState GameState
@@ -141,7 +156,6 @@ namespace GameCompletionHelper.ViewModel
         public GameViewModel()
         {
             game = Game.Empty;
-            InDesign = true;
         }
 
         public GameViewModel(IGame game, IGameSessionFactory sessionFactory)
@@ -149,6 +163,8 @@ namespace GameCompletionHelper.ViewModel
             InDesign = false;
             this.game = game;
             this.sessionFactory = sessionFactory;
+            AttachToGameEvents();
+            this.Sessions = new ObservableCollection<GameSession>(this.game.Sessions);
         }
 
         #endregion ctors
@@ -228,6 +244,22 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        private ObservableCollection<GameSession> sessions;
+
+        public ObservableCollection<GameSession> Sessions
+        {
+            get
+            {
+                return sessions;
+            }
+
+            set
+            {
+                sessions = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string Name
         {
             get
@@ -255,6 +287,8 @@ namespace GameCompletionHelper.ViewModel
         {
             return this.game.GetSessionAt(startTime);
         }
+
+        public event EventHandler SessionsChanged;
 
         #endregion IGame
 
@@ -397,6 +431,7 @@ namespace GameCompletionHelper.ViewModel
         {
             var viewModel = new OptionsViewModel(this.game.Options);
             var window = new GameOptionsWindow(viewModel);
+            window.Title = this.Name + " - options";
             window.DataContext = viewModel;
             window.Show();
         }
@@ -423,6 +458,15 @@ namespace GameCompletionHelper.ViewModel
         }
 
         #endregion Command methods
+
+        private void AttachToGameEvents()
+        {
+            this.game.SessionsChanged += (sender, args) =>
+            {
+                Sessions = new ObservableCollection<GameSession>(((IGame)this).Sessions);
+                this.OnPropertyChanged(nameof(this.Sessions));
+            };
+        }
 
         private void UpdateGameState()
         {

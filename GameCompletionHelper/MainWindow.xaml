@@ -6,9 +6,11 @@
         xmlns:local="clr-namespace:GameCompletionHelper"
         xmlns:viewModels="clr-namespace:GameCompletionHelper.ViewModel"
         xmlns:views="clr-namespace:GameCompletionHelper.Views"
+        xmlns:models="clr-namespace:GameCompletionHelper.Model"
         xmlns:enums="clr-namespace:GameCompletionHelper.ViewModel.Enums"
         mc:Ignorable="d" Icon="Icon.ico"
-        Title="Game Completion Helper" Height="350" Width="525">
+        MinHeight="300"
+        Title="Game Completion Helper" Height="350" Width="825">
     <Window.DataContext>
         <viewModels:MainViewModel />
     </Window.DataContext>
@@ -54,10 +56,16 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
+
+        <DataTemplate x:Key="Test" DataType="models:GameSession">
+            <TextBlock Text="{Binding Path=TimePlayed, Mode=OneWay}"></TextBlock>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="150"></ColumnDefinition>
+            <ColumnDefinition Width="2"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition Width="2"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
@@ -67,22 +75,29 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Menu x:Name="menu" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Height="20" VerticalAlignment="Top">
+
+        <Menu x:Name="menu" Grid.ColumnSpan="5" HorizontalAlignment="Stretch" Height="20" VerticalAlignment="Top">
             <MenuItem Header="Run game" Command="{Binding Path=RunNextGameCommand}"></MenuItem>
             <MenuItem Header="Select game" Command="{Binding Path=ShowNextGameCommand}"></MenuItem>
             <MenuItem Header="Force update" Command="{Binding Path=UpdateProcessesCommand}"></MenuItem>
         </Menu>
+
         <ListView Grid.Row="1" ItemsSource="{Binding Path=Games}" SelectedValue="{Binding SelectedGame}" ItemTemplate="{StaticResource GameViewModelTemplate}" />
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="2" HorizontalAlignment="Stretch"></GridSplitter>
         <Button Grid.Row="2" Command="{Binding AddGameCommand}">Add game</Button>
         <Button Grid.Row="3" Command="{Binding SaveAllCommand}">Save</Button>
-        <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">
+
+        <Grid MinHeight="230" Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <views:GameEditor DataContext="{Binding Path=SelectedGame}"></views:GameEditor>
-            <Button Grid.Row="1" Command="{Binding RemoveCurrentGameCommand}">Remove</Button>
+            <Button Grid.Row="1" MinWidth="300" Command="{Binding RemoveCurrentGameCommand}">Remove</Button>
         </Grid>
+
+        <GridSplitter Grid.Row="1" Grid.Column="3" Width="2" HorizontalAlignment="Stretch"></GridSplitter>
+
+        <views:GameSessionViewer DataContext="{Binding Path=SelectedGame}" Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" />
     </Grid>
 </Window>

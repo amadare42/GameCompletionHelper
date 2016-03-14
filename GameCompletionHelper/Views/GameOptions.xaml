@@ -16,6 +16,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"></Setter>
             </Style>
         </Grid.Resources>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition ></ColumnDefinition>

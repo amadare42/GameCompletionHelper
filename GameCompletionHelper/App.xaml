@@ -2,8 +2,10 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:GameCompletionHelper"
+             xmlns:converters="clr-namespace:GameCompletionHelper.Helpers.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <converters:FormatTimeSpanConverter x:Key="TimeSpanConverter" />
+        <converters:InvertBoolConverter x:Key="InvBoolConverter" />
     </Application.Resources>
 </Application>

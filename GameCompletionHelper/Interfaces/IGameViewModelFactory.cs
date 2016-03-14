@@ -1,6 +1,6 @@
 ﻿using GameCompletionHelper.ViewModel;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Interfaces
 {
     public interface IGameViewModelFactory
     {

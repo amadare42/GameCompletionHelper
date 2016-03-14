@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 namespace ProcessWatch
 {
-    internal class ProcessTrackerSource<TProcessNotifier, TActiveWindowChangedNotifier> : IProgramTrackerSource, IDisposable
+    internal class ProcessTrackerSource<TProcessNotifier, TActiveWindowChangedNotifier>
+            : IProgramTrackerSource
         where TProcessNotifier : IProcessNotifier, IControllableHook
         where TActiveWindowChangedNotifier : IActiveWindowNotifier, IControllableHook
     {
@@ -39,8 +40,7 @@ namespace ProcessWatch
         public void Dispose()
         {
             var dis = this.processNotifier as IDisposable;
-            if (dis != null)
-                dis.Dispose();
+            dis?.Dispose();
             this.activeWindowNotifier.PauseHook();
         }
     }

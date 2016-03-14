@@ -1,9 +1,9 @@
-﻿using GameCompletionHelper.Properties;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
+using GameCompletionHelper.Properties;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Helpers
 {
     public static class BitmapHelper
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Interfaces
 {
     public interface IGamesProvider
     {

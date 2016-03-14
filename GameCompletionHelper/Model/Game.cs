@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using GameCompletionHelper.Interfaces;
 
 namespace GameCompletionHelper.Model
 {
@@ -51,6 +52,8 @@ namespace GameCompletionHelper.Model
 
         public string Name { get; set; }
 
+        public event EventHandler SessionsChanged;
+
         public override string ToString()
         {
             return this.Name;
@@ -59,11 +62,15 @@ namespace GameCompletionHelper.Model
         public void AddSession(GameSession session)
         {
             this.Sessions.Add(session);
+            if (this.SessionsChanged != null)
+                this.SessionsChanged(this, new EventArgs());
         }
 
         public void RemoveSession(GameSession session)
         {
             this.Sessions.Remove(session);
+            if (this.SessionsChanged != null)
+                this.SessionsChanged(this, new EventArgs());
         }
 
         public GameSession GetSessionAt(DateTime startTime)

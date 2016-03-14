@@ -1,17 +1,19 @@
-﻿using GameCompletionHelper.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using GameCompletionHelper.Model;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Interfaces
 {
     public interface IGame
     {
+        string Name { get; set; }
         Options Options { get; set; }
         string PathToExe { get; set; }
         TimeSpan PlayedTotal { get; }
         DateTime LastLaunched { get; }
         IEnumerable<GameSession> Sessions { get; }
-        string Name { get; set; }
+
+        event EventHandler SessionsChanged;
 
         void AddSession(GameSession session);
 

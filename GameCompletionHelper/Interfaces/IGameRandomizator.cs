@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Interfaces
 {
     //todo: implement session-based randomizator
     public interface IGameRandomizator

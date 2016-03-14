@@ -80,21 +80,20 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BaseViewModel.cs" />
-    <Compile Include="BitmapHelper.cs" />
-    <Compile Include="DefaultGameSessionFactory.cs" />
-    <Compile Include="DefaultGameViewModelFactory.cs" />
-    <Compile Include="DefaultGameRandomizator.cs" />
+    <Compile Include="Helpers\BitmapHelper.cs" />
+    <Compile Include="Factories\DefaultGameSessionFactory.cs" />
+    <Compile Include="Factories\DefaultGameViewModelFactory.cs" />
+    <Compile Include="Implementations\DefaultGameRandomizator.cs" />
     <Compile Include="Formatters\DateTimeFormatter.cs" />
-    <Compile Include="GameEventArgs.cs" />
-    <Compile Include="GameProviders\FileSystemGameProvider.cs" />
+    <Compile Include="Implementations\FileSystemGameProvider.cs" />
     <Compile Include="Formatters\TimeSpanFormatter.cs" />
-    <Compile Include="Helpers\InvertBoolConverter.cs" />
-    <Compile Include="Helpers\TimeSpanConverter.cs" />
-    <Compile Include="IGame.cs" />
-    <Compile Include="IGameSessionFactory.cs" />
-    <Compile Include="IGameViewModelFactory.cs" />
-    <Compile Include="IGameRandomizator.cs" />
-    <Compile Include="IGamesProvider.cs" />
+    <Compile Include="Helpers\Converters\InvertBoolConverter.cs" />
+    <Compile Include="Helpers\Converters\TimeSpanConverter.cs" />
+    <Compile Include="Interfaces\IGame.cs" />
+    <Compile Include="Interfaces\IGameSessionFactory.cs" />
+    <Compile Include="Interfaces\IGameViewModelFactory.cs" />
+    <Compile Include="Interfaces\IGameRandomizator.cs" />
+    <Compile Include="Interfaces\IGamesProvider.cs" />
     <Compile Include="Model\GameSession.cs" />
     <Compile Include="Model\Options.cs" />
     <Compile Include="RelayCommand.cs" />
@@ -110,6 +109,9 @@
     </Compile>
     <Compile Include="Views\GameOptionsWindow.xaml.cs">
       <DependentUpon>GameOptionsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GameSessionViewer.xaml.cs">
+      <DependentUpon>GameSessionViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="WinApi.cs" />
     <Page Include="MainWindow.xaml">
@@ -133,6 +135,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GameOptionsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GameSessionViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

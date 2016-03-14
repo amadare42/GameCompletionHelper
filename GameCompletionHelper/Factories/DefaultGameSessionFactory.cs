@@ -1,7 +1,8 @@
-﻿using GameCompletionHelper.Model;
+﻿using GameCompletionHelper.Interfaces;
+using GameCompletionHelper.Model;
 using System;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Factories
 {
     internal class DefaultGameSessionFactory : IGameSessionFactory
     {

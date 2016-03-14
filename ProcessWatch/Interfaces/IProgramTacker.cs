@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ProcessWatch
+namespace ProcessWatch.Interfaces
 {
     public interface IProgramTracker
     {

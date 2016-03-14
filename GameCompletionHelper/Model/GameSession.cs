@@ -7,6 +7,7 @@ namespace GameCompletionHelper.Model
     {
         [XmlIgnore]
         public TimeSpan TimePlayed { get; set; }
+
         public DateTime SessionStart { get; set; }
 
         [XmlElement("TimePlayedTicks")]

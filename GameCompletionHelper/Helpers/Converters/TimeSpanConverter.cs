@@ -1,10 +1,9 @@
-﻿using GameCompletionHelper.Formatters;
-using System;
+﻿using System;
 using System.Globalization;
-using System.Text;
 using System.Windows.Data;
+using GameCompletionHelper.Formatters;
 
-namespace GameCompletionHelper.Helpers
+namespace GameCompletionHelper.Helpers.Converters
 {
     class FormatTimeSpanConverter : IValueConverter
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using GameCompletionHelper.Interfaces;
 
-namespace GameCompletionHelper.GameProviders
+namespace GameCompletionHelper.Implementations
 {
     internal class FileSystemGameProvider : IGamesProvider
     {

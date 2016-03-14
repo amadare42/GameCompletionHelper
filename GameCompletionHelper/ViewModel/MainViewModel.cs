@@ -1,7 +1,10 @@
-﻿using ProcessWatch;
+﻿using GameCompletionHelper.Interfaces;
+using ProcessWatch;
+using ProcessWatch.Interfaces;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace GameCompletionHelper.ViewModel
 {
@@ -176,8 +179,12 @@ namespace GameCompletionHelper.ViewModel
 
         private void RemoveCurrentGame(object obj)
         {
-            this.gameTracker.RemoveProgram(SelectedGame);
-            this.Games.Remove(SelectedGame);
+            var result = MessageBox.Show(string.Format("Are you sure want to delete {0}?", this.SelectedGame.Name), this.SelectedGame.Name, MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation);
+            if (result == MessageBoxResult.Yes)
+            {
+                this.gameTracker.RemoveProgram(SelectedGame);
+                this.Games.Remove(SelectedGame);
+            }
         }
 
         public void AddGame(object o)

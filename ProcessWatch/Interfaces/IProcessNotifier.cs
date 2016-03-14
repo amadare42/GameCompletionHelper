@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProcessWatch
+namespace ProcessWatch.Interfaces
 {
     internal interface IProcessNotifier
     {

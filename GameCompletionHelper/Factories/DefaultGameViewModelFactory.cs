@@ -1,8 +1,8 @@
-﻿using System;
-using GameCompletionHelper.ViewModel;
+﻿using GameCompletionHelper.Interfaces;
 using GameCompletionHelper.Model;
+using GameCompletionHelper.ViewModel;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Factories
 {
     class DefaultGameViewModelFactory : IGameViewModelFactory
     {

@@ -1,4 +1,5 @@
-﻿using GameCompletionHelper.GameProviders;
+﻿using GameCompletionHelper.Factories;
+using GameCompletionHelper.Implementations;
 using GameCompletionHelper.ViewModel;
 using ProcessWatch;
 using ProcessWatch.Interfaces;
@@ -12,7 +13,7 @@ namespace GameCompletionHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IProgramTrackerSource processTrackerSource;
+        private readonly IProgramTrackerSource processTrackerSource;
 
         public MainWindow()
         {

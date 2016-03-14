@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GameCompletionHelper.Interfaces;
 
-namespace GameCompletionHelper
+namespace GameCompletionHelper.Implementations
 {
     public class DefaultGameRandomizator : IGameRandomizator
     {
@@ -12,6 +10,5 @@ namespace GameCompletionHelper
         {
             return games.OrderBy(game => game.LastLaunched).FirstOrDefault();
         }
-        
     }
 }
