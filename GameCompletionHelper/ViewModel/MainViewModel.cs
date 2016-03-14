@@ -36,9 +36,24 @@ namespace GameCompletionHelper.ViewModel
             {
                 new GameViewModel()
                     {
-                        Name = "Game",
+                        Name = "Active game",
                         GameState = Enums.GameState.LaunchedActive
-                    }
+                    },
+                new GameViewModel()
+                    {
+                        Name = "Launched not active game",
+                        GameState = Enums.GameState.LaunchedNotActive
+                    },
+                new GameViewModel()
+                    {
+                        Name = "Game with invalid path",
+                        GameState = Enums.GameState.InvalidPath
+                    },
+                new GameViewModel()
+                    {
+                        Name = "Configured game",
+                        GameState = Enums.GameState.ValidNotLaunched
+                    },
             };
         }
 
@@ -203,7 +218,7 @@ namespace GameCompletionHelper.ViewModel
 
         public void SaveAll(object o)
         {
-            gamesProvider.SaveGames(this.Games.Select(g => g.game));
+            gamesProvider.SaveGames(this.Games);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GameCompletionHelper.Model;
+﻿using GameCompletionHelper.Formatters;
+using GameCompletionHelper.Model;
 using GameCompletionHelper.Properties;
 using GameCompletionHelper.ViewModel.Enums;
 using GameCompletionHelper.Views;
@@ -6,7 +7,6 @@ using Microsoft.Win32;
 using ProcessWatch;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -190,6 +190,14 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        public string LastLaunchedFormatted
+        {
+            get
+            {
+                return DateTimeFormatter.ConvertToString(this.LastLaunched, !this.IsOpened);
+            }
+        }
+
         public DateTime LastLaunched
         {
             get
@@ -275,6 +283,7 @@ namespace GameCompletionHelper.ViewModel
             {
                 this.AddSession(currentSession);
             }
+            this.OnPropertyChanged(nameof(LastLaunchedFormatted));
             this.OnPropertyChanged(nameof(LastLaunched));
             this.IsOpened = true;
             var inactiveTime = 0;
@@ -295,6 +304,7 @@ namespace GameCompletionHelper.ViewModel
             {
                 this.RemoveSession(this.currentSession);
                 this.OnPropertyChanged(nameof(PlayedTotal));
+                this.OnPropertyChanged(nameof(LastLaunchedFormatted));
                 this.OnPropertyChanged(nameof(LastLaunched));
             }
             this.OnPropertyChanged(nameof(AverageSessionSpan));
@@ -419,30 +429,28 @@ namespace GameCompletionHelper.ViewModel
             if (this.InDesign)
                 return;
 
-            GameState state;
             if (!this.FileExists)
             {
-                state = GameState.InvalidPath;
+                this.GameState = GameState.InvalidPath;
             }
             else
             {
                 if (!this.IsOpened)
                 {
-                    state = GameState.ValidNotLaunched;
+                    this.GameState = GameState.ValidNotLaunched;
                 }
                 else
                 {
                     if (this.IsActive)
                     {
-                        state = GameState.LaunchedActive;
+                        this.GameState = GameState.LaunchedActive;
                     }
                     else
                     {
-                        state = GameState.LaunchedNotActive;
+                        this.GameState = GameState.LaunchedNotActive;
                     }
                 }
             }
-            this.GameState = state;
         }
 
         public override string ToString()

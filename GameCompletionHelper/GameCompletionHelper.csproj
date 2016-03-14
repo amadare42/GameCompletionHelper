@@ -84,9 +84,10 @@
     <Compile Include="DefaultGameSessionFactory.cs" />
     <Compile Include="DefaultGameViewModelFactory.cs" />
     <Compile Include="DefaultGameRandomizator.cs" />
+    <Compile Include="Formatters\DateTimeFormatter.cs" />
     <Compile Include="GameEventArgs.cs" />
     <Compile Include="GameProviders\FileSystemGameProvider.cs" />
-    <Compile Include="Helpers\DateTimeToStringConverter.cs" />
+    <Compile Include="Formatters\TimeSpanFormatter.cs" />
     <Compile Include="Helpers\InvertBoolConverter.cs" />
     <Compile Include="Helpers\TimeSpanConverter.cs" />
     <Compile Include="IGame.cs" />
@@ -176,6 +177,7 @@
   <ItemGroup>
     <Resource Include="Icon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
