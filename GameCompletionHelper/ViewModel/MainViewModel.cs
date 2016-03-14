@@ -1,12 +1,17 @@
-﻿using GameCompletionHelper.Model;
-using ProcessWatch;
-using System;
+﻿using ProcessWatch;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace GameCompletionHelper.ViewModel
 {
+    //todo: program options
+    /*
+        Language
+        TimeFormatter
+        Multiple game randomizator method
+     */
+
     public class MainViewModel : BaseViewModel
     {
         public ObservableCollection<GameViewModel> Games { get; set; }
