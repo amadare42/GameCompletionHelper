@@ -25,10 +25,12 @@ namespace GameCompletionHelper.ViewModel
 
             set
             {
-                var changed = options.RunPath == value;
-                options.RunPath = value;
+                var changed = options.RunPath != value;
                 if (changed)
+                {
+                    options.RunPath = value;
                     OnPropertyChanged();
+                }
             }
         }
 
@@ -41,10 +43,30 @@ namespace GameCompletionHelper.ViewModel
 
             set
             {
-                var changed = this.options.RunAsAdmin == value;
-                options.RunAsAdmin = value;
+                var changed = this.options.RunAsAdmin != value;
                 if (changed)
+                {
+                    options.RunAsAdmin = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool CalcOnlyOnActive
+        {
+            get
+            {
+                return this.options.CalcOnlyOnActive;
+            }
+
+            set
+            {
+                var changed = this.options.CalcOnlyOnActive != value;
+                if (changed)
+                {
+                    options.CalcOnlyOnActive = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -57,10 +79,12 @@ namespace GameCompletionHelper.ViewModel
 
             set
             {
-                var changed = options.MinimizeWindowsOnStart == value;
-                options.MinimizeWindowsOnStart = value;
+                var changed = options.MinimizeWindowsOnStart != value;
                 if (changed)
+                {
+                    options.MinimizeWindowsOnStart = value;
                     OnPropertyChanged();
+                }
             }
         }
     }

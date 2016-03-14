@@ -8,11 +8,11 @@ namespace GameCompletionHelper.Model
         public string RunPath { get; set; } = string.Empty;
         public bool RunAsAdmin { get; set; }
         public bool MinimizeWindowsOnStart { get; set; }
+        public bool CalcOnlyOnActive { get; set; }
 
         //todo: add to Options
         /*
             * Tags
-            * calculating time only if window is active
             * working catalog
             * include to randomizator
             * desired game session length

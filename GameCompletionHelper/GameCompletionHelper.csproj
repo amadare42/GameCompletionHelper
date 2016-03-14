@@ -88,6 +88,7 @@
     <Compile Include="GameProviders\FileSystemGameProvider.cs" />
     <Compile Include="Helpers\DateTimeToStringConverter.cs" />
     <Compile Include="Helpers\InvertBoolConverter.cs" />
+    <Compile Include="Helpers\TimeSpanConverter.cs" />
     <Compile Include="IGame.cs" />
     <Compile Include="IGameSessionFactory.cs" />
     <Compile Include="IGameViewModelFactory.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Model\GameSession.cs" />
     <Compile Include="Model\Options.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="ViewModel\Enums\GameState.cs" />
     <Compile Include="ViewModel\GameViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\OptionsViewModel.cs" />

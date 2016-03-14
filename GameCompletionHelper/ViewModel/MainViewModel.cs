@@ -32,7 +32,14 @@ namespace GameCompletionHelper.ViewModel
 
         public MainViewModel()
         {
-            this.Games = new ObservableCollection<GameViewModel>();
+            this.Games = new ObservableCollection<GameViewModel>()
+            {
+                new GameViewModel()
+                    {
+                        Name = "Game",
+                        GameState = Enums.GameState.LaunchedActive
+                    }
+            };
         }
 
         public MainViewModel(IGamesProvider gamesProvider, IProgramTracker gameTracker, IGameRandomizator gameRandomizator, IGameViewModelFactory gameViewModelFactory)

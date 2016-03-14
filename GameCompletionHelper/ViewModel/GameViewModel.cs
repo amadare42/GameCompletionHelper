@@ -1,23 +1,25 @@
 ﻿using GameCompletionHelper.Model;
 using GameCompletionHelper.Properties;
+using GameCompletionHelper.ViewModel.Enums;
 using GameCompletionHelper.Views;
 using Microsoft.Win32;
 using ProcessWatch;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace GameCompletionHelper.ViewModel
 {
     public class GameViewModel : BaseViewModel, IGame, ITrackableProgram
     {
         public IGame game;
+        private readonly bool InDesign;
 
         private IGameSessionFactory sessionFactory;
 
@@ -38,7 +40,7 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
-        private bool isActive = true;
+        private bool isActive = false;
 
         public bool IsActive
         {
@@ -48,10 +50,13 @@ namespace GameCompletionHelper.ViewModel
             }
             set
             {
-                var changed = isActive == value;
-                isActive = value;
+                var changed = isActive != value;
                 if (changed)
+                {
+                    isActive = value;
                     OnPropertyChanged();
+                    UpdateGameState();
+                }
             }
         }
 
@@ -74,6 +79,20 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        private GameSession currentSession = null;
+
+        public TimeSpan CurrentSessionSpan
+        {
+            get
+            {
+                if (currentSession == null)
+                {
+                    return default(TimeSpan);
+                }
+                return currentSession.TimePlayed;
+            }
+        }
+
         private bool isOpened;
 
         public bool IsOpened
@@ -86,6 +105,7 @@ namespace GameCompletionHelper.ViewModel
             {
                 isOpened = value;
                 OnPropertyChanged();
+                UpdateGameState();
             }
         }
 
@@ -97,15 +117,36 @@ namespace GameCompletionHelper.ViewModel
             }
         }
 
+        private GameState gameState;
+
+        public GameState GameState
+        {
+            get { return gameState; }
+            set
+            {
+                var changed = gameState != value;
+                if (changed)
+                {
+                    gameState = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         #region ctors
 
-        internal GameViewModel()
+        /// <summary>
+        /// Should be used ONLY in design-time by wpf.
+        /// </summary>
+        public GameViewModel()
         {
             game = Game.Empty;
+            InDesign = true;
         }
 
         public GameViewModel(IGame game, IGameSessionFactory sessionFactory)
         {
+            InDesign = false;
             this.game = game;
             this.sessionFactory = sessionFactory;
         }
@@ -130,10 +171,11 @@ namespace GameCompletionHelper.ViewModel
                 OnPropertyChanged();
                 if (changed)
                 {
-                    OnPropertyChanged("GameIcon");
+                    OnPropertyChanged(nameof(GameIcon));
+                    this.UpdateGameState();
                     if (existed != File.Exists(PathToExe))
                     {
-                        OnPropertyChanged("FileExists");
+                        OnPropertyChanged(nameof(FileExists));
                     }
                 }
             }
@@ -210,8 +252,6 @@ namespace GameCompletionHelper.ViewModel
 
         #region ITrackableProgram
 
-        private GameSession currentSession = null;
-
         private bool wasMinimized = false;
 
         string ITrackableProgram.Path
@@ -224,6 +264,8 @@ namespace GameCompletionHelper.ViewModel
 
         public async void Start(DateTime startTime)
         {
+            //todo: track all multi-instance programs, so after
+            //restart tracker willn't add existed programs
             if (IsOpened)
                 return;
 
@@ -235,12 +277,18 @@ namespace GameCompletionHelper.ViewModel
             }
             this.OnPropertyChanged(nameof(LastLaunched));
             this.IsOpened = true;
+            var inactiveTime = 0;
             while (this.IsOpened)
             {
                 await Task.Delay(500);
-                if (!this.IsActive)
+                //todo: accurate active time calculation
+                if (!this.IsActive && this.Options.CalcOnlyOnActive)
+                {
+                    inactiveTime += 500;
                     continue;
-                this.currentSession.TimePlayed = DateTime.Now - this.currentSession.SessionStart;
+                }
+                this.currentSession.TimePlayed = DateTime.Now - this.currentSession.SessionStart - TimeSpan.FromMilliseconds(inactiveTime);
+                this.OnPropertyChanged(nameof(CurrentSessionSpan));
                 this.OnPropertyChanged(nameof(PlayedTotal));
             }
             if (this.currentSession.TimePlayed.Seconds < 2)
@@ -263,12 +311,12 @@ namespace GameCompletionHelper.ViewModel
 
         public void Activate()
         {
-            //todo: implement Activate login
+            this.IsActive = true;
         }
 
         public void Deactivate()
         {
-            //todo: implement Deactivate login
+            this.IsActive = false;
         }
 
         #endregion ITrackableProgram
@@ -365,6 +413,37 @@ namespace GameCompletionHelper.ViewModel
         }
 
         #endregion Command methods
+
+        private void UpdateGameState()
+        {
+            if (this.InDesign)
+                return;
+
+            GameState state;
+            if (!this.FileExists)
+            {
+                state = GameState.InvalidPath;
+            }
+            else
+            {
+                if (!this.IsOpened)
+                {
+                    state = GameState.ValidNotLaunched;
+                }
+                else
+                {
+                    if (this.IsActive)
+                    {
+                        state = GameState.LaunchedActive;
+                    }
+                    else
+                    {
+                        state = GameState.LaunchedNotActive;
+                    }
+                }
+            }
+            this.GameState = state;
+        }
 
         public override string ToString()
         {

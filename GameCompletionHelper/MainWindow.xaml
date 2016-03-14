@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:GameCompletionHelper"
         xmlns:viewModels="clr-namespace:GameCompletionHelper.ViewModel"
         xmlns:views="clr-namespace:GameCompletionHelper.Views"
+        xmlns:enums="clr-namespace:GameCompletionHelper.ViewModel.Enums"
         mc:Ignorable="d" Icon="Icon.ico"
         Title="Game Completion Helper" Height="350" Width="525">
     <Window.DataContext>
@@ -13,12 +14,16 @@
     </Window.DataContext>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <Style TargetType="TextBlock" x:Key="LaunchedGameStyle">
-            <Setter Property="Foreground" Value="Green"></Setter>
+        <Style TargetType="TextBlock" x:Key="LaunchedActiveStyle">
+            <Setter Property="Foreground" Value="#FF00E200"></Setter>
             <Setter Property="FontWeight" Value="Bold"></Setter>
         </Style>
-        <Style TargetType="TextBlock" x:Key="NotValidatedGameStyle">
+        <Style TargetType="TextBlock" x:Key="InvalidPathStyle">
             <Setter Property="Foreground" Value="Red"></Setter>
+            <Setter Property="FontWeight" Value="Bold"></Setter>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="LaunchedNotActiveStyle">
+            <Setter Property="Foreground" Value="Green"></Setter>
             <Setter Property="FontWeight" Value="Bold"></Setter>
         </Style>
 
@@ -35,11 +40,17 @@
             </Border>
 
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding IsOpened}" Value="True">
-                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource LaunchedGameStyle}" />
+                <DataTrigger Binding="{Binding Path=GameState}" Value="{x:Static enums:GameState.LaunchedActive}">
+                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource LaunchedActiveStyle}" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding FileExists}" Value="False">
-                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource NotValidatedGameStyle}" />
+                <DataTrigger Binding="{Binding Path=GameState}" Value="{x:Static enums:GameState.InvalidPath}">
+                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource InvalidPathStyle}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=GameState}" Value="{x:Static enums:GameState.LaunchedActive}">
+                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource LaunchedActiveStyle}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=GameState}" Value="{x:Static enums:GameState.LaunchedNotActive}">
+                    <Setter TargetName="textBlock" Property="Style" Value="{StaticResource LaunchedNotActiveStyle}" />
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>

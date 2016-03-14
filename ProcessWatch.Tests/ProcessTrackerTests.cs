@@ -14,8 +14,6 @@ namespace ProcessWatch.Tests
         private ControllableWindowNotifier windowNotifier;
         private ProcessTrackerSource<ControllableProcessNotifier, ControllableWindowNotifier> source;
 
-        public string Path = "Tests";
-
         [TestInitialize]
         public void Init()
         {
@@ -112,6 +110,7 @@ namespace ProcessWatch.Tests
             int callOrder = 0;
             var prog1 = new Mock<ITrackableProgram>();
             var prog2 = new Mock<ITrackableProgram>();
+
             prog1.Setup(p => p.Path).Returns(nameof(prog1));
             prog2.Setup(p => p.Path).Returns(nameof(prog2));
             prog1.Setup(p => p.Start(It.IsAny<DateTime>())).Callback(() => Assert.AreEqual(callOrder++, 0));

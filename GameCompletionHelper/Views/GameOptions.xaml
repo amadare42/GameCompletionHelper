@@ -24,6 +24,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
 
         <Label Grid.Column="0">Run as Administrator</Label>
@@ -34,5 +35,8 @@
 
         <Label Grid.Column="0" Grid.Row="2">Minimize windows on start</Label>
         <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding Path=MinimizeWindowsOnStart}" />
+
+        <Label Grid.Column="0" Grid.Row="3">Track time only when window is active</Label>
+        <CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding Path=CalcOnlyOnActive}" />
     </Grid>
 </UserControl>
